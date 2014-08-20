@@ -4,7 +4,8 @@ class Task(object):
     '''Base class for all tasks from Overseer-mini
     '''
 
-    def get_name(self):
+    @property
+    def name(self):
         return type(self).__name__
 
     def __unicode__(self):
