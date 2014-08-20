@@ -1,0 +1,27 @@
+{
+  "ssh": {
+    "user": "defaultuser",
+  },
+  "machines": {
+    "machine-1": {
+      "host": "machine1.sample.example.mini",
+    }
+    "machine-2": {
+      "host": "machine2.sample.example.mini",
+      "ssh": {
+        "user": "m2user",
+        "port": 2222
+      },
+      "metrics": {
+        "diskusage": {
+          "critical": "80%"
+        }
+      }
+    }
+  },
+  "metrics": {
+    "diskusage": {
+      "critical": "60%"
+    }
+  }
+}
