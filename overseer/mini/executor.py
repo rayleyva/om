@@ -24,7 +24,7 @@ class RemoteExecutor(object):
         self.client = self._create_client()
         self.client.connect(self.host, username=self.username)
         for t in self.tasks:
-            print t
+            t.run(self.client)
         self.client.close()
         self.client = None
 
