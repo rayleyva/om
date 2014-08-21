@@ -33,13 +33,12 @@ class ConfigLoader(object):
             ssh = global_ssh.copy()
             ssh.update(m_data.get('ssh', {}))
 
-            re = executor.RemoteExecutor(m_data['host'], ssh['user'],
-                                         ssh.get('port', None))
+            re = executor.Executor(m_data['host'], ssh['user'],
+                                   ssh.get('port', None))
 
-            for task in global_tasks:
-                re.add_task(task)
+            tasks = global_tasks[:]
 
             for task_name, task_data in m_data.get('metrics', []):
-                re.add_task(self.create_task(task_name, task_data))
+                tasks.append(self.create_task(task_name, task_data))
 
-            yield re
+            yield re, tasks
