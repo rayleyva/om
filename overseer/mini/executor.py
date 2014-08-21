@@ -1,43 +1,46 @@
 # -*- coding: utf-8 -*-
 
 import paramiko
+import getpass
 
-class RemoteExecutor(object):
+class Remote(object):
     '''Responsible for connecting and executing tasks remotely
 
     Connects to the remote computer and executes a list of overseer.mini.Task.
     The results are gathered and available to the caller
     '''
 
-    def __init__(self, host, username, port=None):
-        self.tasks = []
+    def __init__(self, host, port=22, username=getpass.getuser(),
+                 password=None, use_local_keys=True, **options):
         self.host = host
-        self.username = username
-        self.port = port
-        self.client = None
+        self.options = options
 
-    def add_task(self, t):
-        self.tasks.append(t)
-
-    def run(self):
+    def run(self, tasks):
         '''Connects to remote computer and execute the tasks
         '''
-        self.client = self._create_client()
-        if self.port:
-          self.client.connect(self.host, username=self.username, port=self.port)
-        else:
-          self.client.connect(self.host, username=self.username)
+        client = self.client
+        client.connect(self.host, port=self.options['port'],
+                            username=self.options['username'],
+                            password=self.options['password'])
+        for t in tasks:
+            t.run(client)
+        client.close()
+        client = None
 
-        for t in self.tasks:
-            t.run(self.client)
-        self.client.close()
-        self.client = None
-
-    def _create_client(self):
+    @property
+    def client(self):
+        '''Returns a client on demand.
+        '''
         client = paramiko.client.SSHClient()
         client.load_system_host_keys()
-
         #FIXME remove this and expose an option to use it
-        client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
-
+        if self.options.use_local_keys:
+            client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
         return client
+
+    def execute(self, plugin):
+        stdin, stdout, stderr = self.client.exec_command(plugin.command)
+        output = stdout.readlines()
+        stderr = stderr.readlines()
+        status = stdout.channel.recv_exit_status()
+        return output, status
