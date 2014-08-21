@@ -11,7 +11,8 @@ class Remote(object):
     '''
 
     def __init__(self, host, port=22, username=getpass.getuser(),
-                 password=None, use_local_keys=True, **options):
+                 password=None, use_local_keys=True,
+                 autoadd_unknown_hosts=True, **options):
         self.host = host
         self.options = options
 
@@ -32,9 +33,8 @@ class Remote(object):
         '''Returns a client on demand.
         '''
         client = paramiko.client.SSHClient()
-        client.load_system_host_keys()
-        #FIXME remove this and expose an option to use it
-        if self.options.use_local_keys:
+        client.load_system_host_keys() if self.options.use_local_keys
+        if self.options.autoadd_unknown_hosts:
             client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
         return client
 
