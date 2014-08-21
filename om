@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import sys
+
+from overseer.mini.supervisor import Supervisor
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print 'Usage: om config.json'
+        sys.exit(0)
+
+    supervisor = Supervisor(sys.argv[1])
+    supervisor.run()

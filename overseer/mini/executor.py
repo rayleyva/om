@@ -27,20 +27,7 @@ class Executor(object):
             args['password'] = self.password
         return args
 
-    def run(self, tasks):
-        '''Connects to remote computer and execute the tasks
-        '''
-        client = self.client
-        optional_args = self._get_connection_optional_args()
-        client.connect(self.host, port=self.port, username=self.username,
-                       **optional_args)
-        for t in tasks:
-            t.run(client)
-        client.close()
-        client = None
-
-    @property
-    def client(self):
+    def get_client(self):
         '''Returns a client on demand.
         '''
         client = paramiko.client.SSHClient()
@@ -51,8 +38,14 @@ class Executor(object):
         return client
 
     def execute(self, plugin):
-        stdin, stdout, stderr = self.client.exec_command(plugin.command)
+        client = self.get_client()
+        optional_args = self._get_connection_optional_args()
+        client.connect(self.host, port=self.port, username=self.username,
+                       **optional_args)
+
+        stdin, stdout, stderr = client.exec_command(plugin.command)
         output = stdout.readlines()
         stderr = stderr.readlines()
         status = stdout.channel.recv_exit_status()
+        client.close()
         return output, status

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from overseer.mini.metric_plugin import PLUGIN_STATES
+from overseer.mini.metrics import PLUGIN_STATES
 
 class Handler(object):
     '''Base class for handlers
@@ -45,7 +45,7 @@ class MailHandler(Handler):
         return True
 
     def handle(self, plugin_result):
-        send_alert(plugin_result) if plugin_result.state != 'normal'
+        if plugin_result.state != 'normal': send_alert(plugin_result)
 
     def send_alert(self, plugin_result):
         # TODO implement

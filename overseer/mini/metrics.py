@@ -13,7 +13,7 @@ class MetricPlugin(object):
     def name(self):
         return type(self).__name__
 
-    def execute(self, executor):
+    def execute(self, remote, host):
         raise NotImplementedError('Run method not implemented in class %s' %
                                   self.get_name())
 
@@ -28,7 +28,7 @@ class ShellMetricPlugin(MetricPlugin):
         raise NotImplementedError()
 
     def _status_check(self, output, status):
-        raise Exception if status != 0
+        if status != 0: raise Exception
         return output
 
     def _output_parse(self, output, status):
@@ -41,7 +41,7 @@ class ShellMetricPlugin(MetricPlugin):
             return 'normal'
 
     def execute(self, remote, host):
-        output, status = remote.execute(self.command)
+        output, status = remote.execute(self)
 
         # Middleware-like processing
         for processor in [self._status_check, self._output_parse]:
@@ -59,5 +59,4 @@ class DiskUsage(ShellMetricPlugin):
         return u'df -h'
 
     def _output_parse(self, output, status):
-        #TODO implement
-        print ''.join(output)
+        return ''.join(output)

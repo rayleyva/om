@@ -2,43 +2,49 @@
 
 import json
 
-from overseer.mini import executor, tasks
-
-class ConfigLoader(object):
+class Config(object):
     '''Loads a config file into a executor and task objects
 
        TODO Document config parameters
     '''
 
     def __init__(self, path):
-        self.path = path
-        self.config = {}
+        self._config = {}
+        self._load_config(path)
 
-    def load(self):
-        with open(self.path) as filedata:
-            self.config = json.load(filedata)
+    def __getitem__(self, key):
+        return self._config.__getitem__(key)
 
-    def create_task(self, name, data):
-        if name == 'diskusage':
-            return tasks.DiskUsageTask()
-        return None #TODO
+    def get(self, key, default_val):
+        return self._config.get(key, default_val)
 
-    def get_executors(self):
-        self.load()
+    def _load_config(self, path):
+        with open(path) as config_file:
+            self._config = json.load(config_file)
 
-        global_ssh = self.config.get('ssh', {})
-        global_tasks = [self.create_task(n,t) for n,t in self.config.get('metrics', {}).items()]
+    # DEPRECATED
+    # def create_task(self, name, data):
+    #     if name == 'diskusage':
+    #         return tasks.DiskUsageTask()
+    #     return None #TODO
 
-        for machine, m_data in self.config['machines'].items():
-            ssh = global_ssh.copy()
-            ssh.update(m_data.get('ssh', {}))
+    # def get_executors(self):
+    #     # DEPRECATED
+    #     self.load()
 
-            re = executor.Executor(m_data['host'], ssh['user'],
-                                   ssh.get('port', None))
+    #     global_ssh = self.config.get('ssh', {})
+    #     global_tasks = [self.create_task(n,t) for n,t in self.config.get('metrics', {}).items()]
 
-            tasks = global_tasks[:]
+    #     for machine, m_data in self.config['machines'].items():
+    #         ssh = global_ssh.copy()
+    #         ssh.update(m_data.get('ssh', {}))
 
-            for task_name, task_data in m_data.get('metrics', []):
-                tasks.append(self.create_task(task_name, task_data))
+    #         re = executor.Executor(m_data['host'], ssh['user'],
+    #                                ssh.get('port', None))
 
-            yield re, tasks
+    #         tasks = global_tasks[:]
+
+    #         for task_name, task_data in m_data.get('metrics', []):
+    #             tasks.append(self.create_task(task_name, task_data))
+
+    #         yield re, tasks
