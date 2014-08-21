@@ -74,7 +74,7 @@ class Supervisor(object):
 
         for machine, config in self.config['machines'].iteritems():
             host = config.get('host')
-            machine_ssh = config['ssh'] or global_ssh
+            machine_ssh = config.get('ssh', global_ssh)
 
             if host is None:
                 raise Exception('Machine host must be present')
