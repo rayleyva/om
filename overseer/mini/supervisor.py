@@ -3,7 +3,7 @@ import time
 
 from overseer.mini.config import Config
 from overseer.mini.handler import StdoutHandler, MailHandler
-from overseer.mini.metrics import DiskUsage
+from overseer.mini.metrics import DiskUsage, MemoryUsage
 from overseer.mini.executor import Executor
 from overseer.mini.utils.logger import get_logger
 
@@ -14,7 +14,7 @@ class Supervisor(object):
     '''Schedules the remote metrics calls for monitored machines. Delegates handling of
     results.
     '''
-    DEFAULT_PLUGINS = [DiskUsage]
+    DEFAULT_PLUGINS = [DiskUsage, MemoryUsage]
     POLL_FREQUENCY_MINUTES = 1
 
     def __init__(self, config_file=None):

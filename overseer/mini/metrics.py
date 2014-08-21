@@ -52,15 +52,15 @@ class ShellMetricPlugin(MetricPlugin):
 
 
 class DiskUsage(ShellMetricPlugin):
-    '''Verifies the amount of disk available on a given partition
+    '''Verifies disk usage
     '''
     name_on_config = 'disk_usage'
-    critical_usage = 80
+    critical = 80
 
-    def __init__(self, critical_usage=critical_usage):
-        if isinstance(critical_usage, unicode):
-            critical_usage = int(critical_usage.replace('%', ''))
-        self.critical_usage = critical_usage
+    def __init__(self, critical=critical):
+        if isinstance(critical, unicode):
+            critical = int(critical.replace('%', ''))
+        self.critical = critical
 
     @property
     def command(self):
@@ -68,14 +68,51 @@ class DiskUsage(ShellMetricPlugin):
 
     def _output_parse(self, output, status):
         message = ''
-        status = 'normal'
+        self.state = 'normal'
 
         for line in output[1:]:
             name, fstype, blocks, used, avail, usage, mnt = line.split()
             usage = int(usage.replace('%', ''))
 
-            if usage >= self.critical_usage:
-                message += "disk %s usage has reached critical: %d%% (over %d%%)." % (name, usage, self.critical_usage)
+            if name == 'none': continue
+
+            if usage >= self.critical:
+                message += "disk %s usage has reached critical: %d%% (over %d%%). " % (name, usage, self.critical)
                 self.state = 'critical'
+            else:
+                message += "disk %s usage: %d%% (used=%s, avail=%s). " % (name, usage, used, avail)
+
+        return message
+
+
+class MemoryUsage(ShellMetricPlugin):
+    '''Verifies memory usage
+    '''
+    name_on_config = 'memory_usage'
+    critical = 70
+
+    def __init__(self, critical=critical):
+        if isinstance(critical, unicode):
+            critical = int(critical.replace('%', ''))
+        self.critical = critical
+
+    @property
+    def command(self):
+        return u'free -m | grep buffers/cache'
+
+    def _output_parse(self, output, status):
+        message = ''
+        self.state = 'normal'
+
+        _, _, used, free = output[0].split()
+        used, free = int(used), int(free)
+        total = used + free
+        usage = 100 * used/float(total)
+
+        if usage >= self.critical:
+            message += "memory usage has reached critical: %d%% (over %d%%)." % (name, usage, self.critical)
+            self.state = 'critical'
+        else:
+            message += "memory usage %.2f%% (used=%d, free=%d)." % (usage, used, free)
 
         return message
