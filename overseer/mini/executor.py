@@ -33,7 +33,8 @@ class Executor(object):
         '''Returns a client on demand.
         '''
         client = paramiko.client.SSHClient()
-        client.load_system_host_keys() if self.options.use_local_keys
+        if self.options.use_local_keys:
+            client.load_system_host_keys()
         if self.options.autoadd_unknown_hosts:
             client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
         return client
