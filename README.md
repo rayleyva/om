@@ -24,6 +24,11 @@ To collect metrics for multiple hosts (also supports hostnames):
 $ ./om 192.168.0.2,box2
 ```
 
+Hostname also supports username, password and port if needed:
+
+```shell
+$ ./om root:mypass@mybox:44445
+```
 
 ## Installation
 

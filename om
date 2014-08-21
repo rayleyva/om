@@ -11,20 +11,27 @@ if __name__ == '__main__':
     if len(sys.argv) == 2:
         import tempfile, json
 
-        machine = {'ssh': {}}
+        machines = {}
+        for machine in sys.argv[1].split(','):
+            config = {'ssh': {}}
 
-        if ':' in sys.argv[1]:
-          machine['host'], machine['ssh']['port'] = sys.argv[1].split(':')
-          machine['ssh']['port'] = int(machine['ssh']['port'])
-        else:
-          machine['host'] = sys.argv[1]
+            if '@' in machine:
+                userpart, machine = machine.split('@')
+                if ':' in userpart:
+                    config['ssh']['username'], config['ssh']['password'] = userpart.split(':')
+                else:
+                    config['username'] = userpart
+
+            if ':' in machine:
+              config['host'], config['ssh']['port'] = machine.split(':')
+              config['ssh']['port'] = int(config['ssh']['port'])
+            else:
+              config['host'] = machine
+
+            machines[config['host']] = config
 
         config = tempfile.NamedTemporaryFile()
-        config.write(json.dumps({
-          'machines': {
-            sys.argv[1]: machine
-          }
-        }))
+        config.write(json.dumps({'machines': machines}))
         config.seek(0)
         supervisor = Supervisor(config.name)
     elif len(sys.argv) == 3:
