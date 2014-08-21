@@ -9,6 +9,10 @@ PLUGIN_STATES = ['normal', 'critical']
 class MetricPlugin(object):
     '''Base class for all metrics
     '''
+
+    def __init__(self, **kwargs):
+        pass
+
     @property
     def name(self):
         return type(self).__name__
@@ -53,10 +57,28 @@ class ShellMetricPlugin(MetricPlugin):
 class DiskUsage(ShellMetricPlugin):
     '''Verifies the amount of disk available on a given partition
     '''
+    name_on_config = 'disk_usage'
+    critical_usage = 80
+
+    def __init__(self, critical_usage=critical_usage):
+        if isinstance(critical_usage, unicode):
+            critical_usage = int(critical_usage.replace('%', ''))
+        self.critical_usage = critical_usage
+        self.parsed = {}
 
     @property
     def command(self):
-        return u'df -h'
+        return u'df -PT'
+
+    def _get_state(self, output, status):
+        if any([disk['capacity'] >= self.critical_usage for name, disk in self.parsed.iteritems()]):
+            return 'critical'
+        else:
+            return 'normal'
 
     def _output_parse(self, output, status):
-        return ''.join(output)
+        for line in output[1:]:
+            name, fstype, blocks, used, avail, capacity, mnt = line.split()
+            capacity = int(capacity.replace('%', ''))
+            self.parsed[name] = { 'fs': fstype, 'capacity': capacity }
+        return self.parsed

@@ -11,12 +11,13 @@ class Supervisor(object):
     '''Schedules the remote metrics calls for monitored machines. Delegates handling of
     results.
     '''
+    DEFAULT_PLUGINS = [DiskUsage]
 
     def __init__(self, config_file=None):
-        self.metric_plugins = [DiskUsage()]
+        self.config = Config(config_file)
+        self.host_plugins = self._load_plugins()
         self.handlers = [StdoutHandler()]
         self.running = False
-        self.config = Config(config_file)
         self.executors = {}
 
         global_ssh = self.config.get('ssh', {})
@@ -43,7 +44,7 @@ class Supervisor(object):
         print "Collecting metrics for machine=%s" % machine
         results = []
 
-        for plugin in self.metric_plugins:
+        for plugin in self.host_plugins[machine]:
             results.append(plugin.execute(self.executors[machine], machine))
 
         self.handle_results(results)
@@ -58,3 +59,23 @@ class Supervisor(object):
         '''Return a list of handlers interested on this plugin result
         '''
         return [handler for handler in self.handlers if handler.handles(plugin_result)]
+
+    def _load_plugins(self):
+        plugins = self.DEFAULT_PLUGINS
+        plugins_per_host = {}
+
+        global_metrics = self.config.get('metrics', {})
+
+        for machine, config in self.config['machines'].iteritems():
+            plugin_instances = []
+            machine_metrics = config.get('metrics', {})
+
+            for plugin_class in plugins:
+                plugin_name = plugin_class.name_on_config
+                overrides = machine_metrics.get(plugin_name) or global_metrics.get(plugin_name)
+                overrides = overrides or {}
+                plugin_instances.append(plugin_class(**overrides))
+
+            plugins_per_host[machine] = plugin_instances
+
+        return plugins_per_host

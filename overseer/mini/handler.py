@@ -34,7 +34,7 @@ class StdoutHandler(Handler):
         return True
 
     def handle(self, plugin_result):
-        print "[%s]\t[%s]: %s (%s)" % (plugin_result.host, plugin_result.plugin.name, plugin_result.value, plugin_result.state)
+        print "%s.%s: %s (%s)" % (plugin_result.host, plugin_result.plugin.name, plugin_result.value, plugin_result.state)
 
 
 class MailHandler(Handler):

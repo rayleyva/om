@@ -21,30 +21,3 @@ class Config(object):
     def _load_config(self, path):
         with open(path) as config_file:
             self._config = json.load(config_file)
-
-    # DEPRECATED
-    # def create_task(self, name, data):
-    #     if name == 'diskusage':
-    #         return tasks.DiskUsageTask()
-    #     return None #TODO
-
-    # def get_executors(self):
-    #     # DEPRECATED
-    #     self.load()
-
-    #     global_ssh = self.config.get('ssh', {})
-    #     global_tasks = [self.create_task(n,t) for n,t in self.config.get('metrics', {}).items()]
-
-    #     for machine, m_data in self.config['machines'].items():
-    #         ssh = global_ssh.copy()
-    #         ssh.update(m_data.get('ssh', {}))
-
-    #         re = executor.Executor(m_data['host'], ssh['user'],
-    #                                ssh.get('port', None))
-
-    #         tasks = global_tasks[:]
-
-    #         for task_name, task_data in m_data.get('metrics', []):
-    #             tasks.append(self.create_task(task_name, task_data))
-
-    #         yield re, tasks
