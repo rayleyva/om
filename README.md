@@ -7,7 +7,7 @@ Collect disk usage, memory and cpu load info on remote boxes without having to i
 
 - Disk and memory usage
 - CPU load
-- Supports email alerts when alerts get to a critical state (nearly full disk, low free memory, high cpu load, etc)
+- Supports email alerts when resources get to a critical state (e.g. nearly full disk, low free memory, high cpu load, etc)
 
 
 ## Usage
