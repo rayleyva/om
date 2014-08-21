@@ -105,7 +105,9 @@ You can also override the default value globally:
     },
     "my_postgres": {
       "host": "postgresbox",
-      "critical": "60%"
+      "disk_usage": {
+        "critical": "60%"
+      }
     }
   },
   "metrics": {
