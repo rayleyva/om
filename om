@@ -6,9 +6,35 @@ import sys
 from overseer.mini.supervisor import Supervisor
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print 'Usage: om config.json'
-        sys.exit(0)
+    supervisor = None
 
-    supervisor = Supervisor(sys.argv[1])
-    supervisor.run()
+    if len(sys.argv) == 2:
+        import tempfile, json
+
+        machine = {'ssh': {}}
+
+        if ':' in sys.argv[1]:
+          machine['host'], machine['ssh']['port'] = sys.argv[1].split(':')
+          machine['ssh']['port'] = int(machine['ssh']['port'])
+        else:
+          machine['host'] = sys.argv[1]
+
+        config = tempfile.NamedTemporaryFile()
+        config.write(json.dumps({
+          'machines': {
+            sys.argv[1]: machine
+          }
+        }))
+        config.seek(0)
+        supervisor = Supervisor(config.name)
+    elif len(sys.argv) == 3:
+        if sys.argv[1] == '-c':
+            supervisor = Supervisor(sys.argv[2])
+
+    if supervisor:
+        supervisor.run()
+    else:
+        print 'Usage:'
+        print '\tom <host>'
+        print '\tom -c <config.json>'
+        sys.exit(0)

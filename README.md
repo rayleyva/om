@@ -9,6 +9,22 @@ Minimal monitoring system. Monitors any machine without having to install any so
 - Metrics: disk and memory usage
 - Email alerts
 
+
+## Usage
+
+To collect metrics for a host:
+
+```shell
+$ ./om 192.168.0.1
+```
+
+To collect metrics for multiple hosts (also supports hostnames):
+
+```shell
+$ ./om 192.168.0.2,box2
+```
+
+
 ## Installation
 
 No packages have been released yet. For a development preview, please fetch the code:
@@ -25,7 +41,7 @@ $ ./om
 ### Using a config file
 
 ```shell
-$ ./om <config.json>
+$ ./om -c <config.json>
 ```
 
 ## Configuration

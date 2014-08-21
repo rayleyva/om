@@ -3,10 +3,6 @@
 import json
 
 class Config(object):
-    '''Loads a config file into a executor and task objects
-
-       TODO Document config parameters
-    '''
 
     def __init__(self, path):
         self._config = {}
@@ -19,5 +15,6 @@ class Config(object):
         return self._config.get(key, default_val)
 
     def _load_config(self, path):
-        with open(path) as config_file:
-            self._config = json.load(config_file)
+        if path is not None:
+            with open(path) as config_file:
+                self._config = json.load(config_file)
