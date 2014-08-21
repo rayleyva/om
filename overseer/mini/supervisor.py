@@ -2,7 +2,7 @@
 import time
 
 from overseer.mini.config import Config
-from overseer.mini.handler import StdoutHandler
+from overseer.mini.handler import StdoutHandler, MailHandler
 from overseer.mini.metrics import DiskUsage
 from overseer.mini.executor import Executor
 
@@ -20,6 +20,7 @@ class Supervisor(object):
         self.host_plugins = self._load_plugins()
         self.handlers = [StdoutHandler()]
         self.executors = self._load_executors()
+        self._load_handlers()
 
     def run(self):
         self.running = True
@@ -82,3 +83,8 @@ class Supervisor(object):
             executors[machine] = Executor(host, **machine_ssh)
 
         return executors
+
+    def _load_handlers(self)
+        for handler, config in self.config['handlers'].iteritems():
+            if handler == 'email':
+                self.handlers.append(MailHandler(**config))

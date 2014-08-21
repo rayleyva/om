@@ -23,5 +23,15 @@
     "diskusage": {
       "critical": "60%"
     }
+  },
+  "handlers": {
+    "email": {
+      "smtp": "smtp.host",
+      "port": 587,
+      "login": "smtpuser",
+      "password": "smtppassword",
+      "from": "test@myhost",
+      "to": ["destination1@myhost", "destination2@myhost"]
+    }
   }
 }
