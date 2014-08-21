@@ -5,6 +5,8 @@ from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
 from overseer.mini.metrics import PLUGIN_STATES
+from overseer.mini.utils.logger import get_logger
+
 
 class Handler(object):
     '''Base class for handlers
@@ -29,6 +31,9 @@ class Handler(object):
     def handle(self, plugin_result):
         raise NotImplementedError
 
+    def __repr__(self):
+        return "<Handler:%s>" % type(self).__name__
+
 
 class StdoutHandler(Handler):
     '''Outputs all metrics to stdout
@@ -38,7 +43,11 @@ class StdoutHandler(Handler):
         return True
 
     def handle(self, plugin_result):
-        print "%s.%s: %s (%s)" % (plugin_result.host, plugin_result.plugin.name, plugin_result.value, plugin_result.state)
+        log = get_logger("metric:%s:%s:%s" % (plugin_result.host, plugin_result.plugin.name_on_config, plugin_result.state))
+        if plugin_result.state == 'critical':
+            log.error("%s" % (plugin_result.value))
+        else:
+            log.debug("%s" % (plugin_result.value))
 
 
 class MailHandler(Handler):

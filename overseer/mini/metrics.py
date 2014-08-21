@@ -22,7 +22,10 @@ class MetricPlugin(object):
                                   self.get_name())
 
     def __unicode__(self):
-        return self.get_name()
+        return self.name
+
+    def __repr__(self):
+        return "<Metric name='%s'>" % (self.name_on_config)
 
 
 class ShellMetricPlugin(MetricPlugin):
@@ -38,12 +41,6 @@ class ShellMetricPlugin(MetricPlugin):
     def _output_parse(self, output, status):
         return output
 
-    def _get_state(self, output, status):
-        if status != 0:
-            return 'critical'
-        else:
-            return 'normal'
-
     def execute(self, remote, host):
         output, status = remote.execute(self)
 
@@ -51,7 +48,7 @@ class ShellMetricPlugin(MetricPlugin):
         for processor in [self._status_check, self._output_parse]:
             output = processor(output, status)
 
-        return MetricPluginResult(self, host, self._get_state(output, status), output)
+        return MetricPluginResult(self, host, self.state, output)
 
 
 class DiskUsage(ShellMetricPlugin):
@@ -64,21 +61,21 @@ class DiskUsage(ShellMetricPlugin):
         if isinstance(critical_usage, unicode):
             critical_usage = int(critical_usage.replace('%', ''))
         self.critical_usage = critical_usage
-        self.parsed = {}
 
     @property
     def command(self):
         return u'df -PT'
 
-    def _get_state(self, output, status):
-        if any([disk['capacity'] >= self.critical_usage for name, disk in self.parsed.iteritems()]):
-            return 'critical'
-        else:
-            return 'normal'
-
     def _output_parse(self, output, status):
+        message = ''
+        status = 'normal'
+
         for line in output[1:]:
-            name, fstype, blocks, used, avail, capacity, mnt = line.split()
-            capacity = int(capacity.replace('%', ''))
-            self.parsed[name] = { 'fs': fstype, 'capacity': capacity }
-        return self.parsed
+            name, fstype, blocks, used, avail, usage, mnt = line.split()
+            usage = int(usage.replace('%', ''))
+
+            if usage >= self.critical_usage:
+                message += "disk %s usage has reached critical: %d%% (over %d%%)." % (name, usage, self.critical_usage)
+                self.state = 'critical'
+
+        return message

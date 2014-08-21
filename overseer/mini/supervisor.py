@@ -5,6 +5,9 @@ from overseer.mini.config import Config
 from overseer.mini.handler import StdoutHandler, MailHandler
 from overseer.mini.metrics import DiskUsage
 from overseer.mini.executor import Executor
+from overseer.mini.utils.logger import get_logger
+
+log = get_logger("supervisor")
 
 
 class Supervisor(object):
@@ -18,9 +21,8 @@ class Supervisor(object):
         self.running = False
         self.config = Config(config_file)
         self.host_plugins = self._load_plugins()
-        self.handlers = [StdoutHandler()]
         self.executors = self._load_executors()
-        self._load_handlers()
+        self.handlers = self._load_handlers()
 
     def run(self):
         self.running = True
@@ -30,7 +32,7 @@ class Supervisor(object):
             time.sleep(self.POLL_FREQUENCY_MINUTES * 60)
 
     def collect_metrics(self, machine):
-        print "Collecting metrics for machine=%s" % machine
+        log.info("collecting metrics for machine=%s" % machine)
         results = []
 
         for plugin in self.host_plugins[machine]:
@@ -67,6 +69,7 @@ class Supervisor(object):
 
             plugins_per_host[machine] = plugin_instances
 
+        log.debug('loaded plugins %s' % plugins_per_host)
         return plugins_per_host
 
     def _load_executors(self):
@@ -82,9 +85,14 @@ class Supervisor(object):
 
             executors[machine] = Executor(host, **machine_ssh)
 
+        log.debug('loaded host connections %s' % executors)
         return executors
 
-    def _load_handlers(self)
-        for handler, config in self.config['handlers'].iteritems():
+    def _load_handlers(self):
+        handlers = [StdoutHandler()]
+        for handler, config in self.config.get('handlers', {}).iteritems():
             if handler == 'email':
-                self.handlers.append(MailHandler(**config))
+                handlers.append(MailHandler(**config))
+
+        log.debug('loaded handlers %s' % handlers)
+        return handlers

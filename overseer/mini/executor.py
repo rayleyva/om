@@ -49,3 +49,8 @@ class Executor(object):
         status = stdout.channel.recv_exit_status()
         client.close()
         return output, status
+
+    def __repr__(self):
+        return "<Connection " + \
+               "host='%s' port=%d username='%s' password='%s'>" \
+               % (self.host, self.port, self.username, 'REDACTED' if self.password else '')
