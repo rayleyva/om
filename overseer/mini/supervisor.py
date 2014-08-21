@@ -12,33 +12,21 @@ class Supervisor(object):
     results.
     '''
     DEFAULT_PLUGINS = [DiskUsage]
+    POLL_FREQUENCY_MINUTES = 1
 
     def __init__(self, config_file=None):
+        self.running = False
         self.config = Config(config_file)
         self.host_plugins = self._load_plugins()
         self.handlers = [StdoutHandler()]
-        self.running = False
-        self.executors = {}
-
-        global_ssh = self.config.get('ssh', {})
-
-        for machine, config in self.config['machines'].iteritems():
-            print "Creating executor for %s (extra vars: %s)" % (machine, config)
-
-            host = config.get('host')
-            machine_ssh = config['ssh'] or global_ssh
-
-            if host is None:
-                raise Exception('Machine host must be present')
-
-            self.executors[machine] = Executor(host, **machine_ssh)
+        self.executors = self._load_executors()
 
     def run(self):
         self.running = True
 
         while self.running:
             map(self.collect_metrics, self.config['machines'])
-            time.sleep(15)
+            time.sleep(self.POLL_FREQUENCY_MINUTES * 60)
 
     def collect_metrics(self, machine):
         print "Collecting metrics for machine=%s" % machine
@@ -79,3 +67,18 @@ class Supervisor(object):
             plugins_per_host[machine] = plugin_instances
 
         return plugins_per_host
+
+    def _load_executors(self):
+        global_ssh = self.config.get('ssh', {})
+        executors = {}
+
+        for machine, config in self.config['machines'].iteritems():
+            host = config.get('host')
+            machine_ssh = config['ssh'] or global_ssh
+
+            if host is None:
+                raise Exception('Machine host must be present')
+
+            executors[machine] = Executor(host, **machine_ssh)
+
+        return executors
