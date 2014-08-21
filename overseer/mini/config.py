@@ -18,23 +18,28 @@ class ConfigLoader(object):
         with open(self.path) as filedata:
             self.config = json.load(filedata)
 
-    def create_task(self, data):
-        if data['type'] == 'diskusage':
+    def create_task(self, name, data):
+        if name == 'diskusage':
             return tasks.DiskUsageTask()
         return None #TODO
 
     def get_executors(self):
         self.load()
 
-        global_tasks = [self.create_task(t) for t in self.config.get('tasks', [])]
+        global_ssh = self.config.get('ssh', {})
+        global_tasks = [self.create_task(n,t) for n,t in self.config.get('metrics', {}).items()]
 
-        for machine in self.config['machines']:
-            re = executor.RemoteExecutor(machine['host'], machine.get('username', self.config['username']))
+        for machine, m_data in self.config['machines'].items():
+            ssh = global_ssh.copy()
+            ssh.update(m_data.get('ssh', {}))
+
+            re = executor.RemoteExecutor(m_data['host'], ssh['user'],
+                                         ssh.get('port', None))
 
             for task in global_tasks:
                 re.add_task(task)
 
-            for task_data in machine.get('tasks', []):
-                re.add_task(self.create_task(task_data))
+            for task_name, task_data in m_data.get('metrics', []):
+                re.add_task(self.create_task(task_name, task_data))
 
             yield re

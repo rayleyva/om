@@ -9,10 +9,11 @@ class RemoteExecutor(object):
     The results are gathered and available to the caller
     '''
 
-    def __init__(self, host, username):
+    def __init__(self, host, username, port=None):
         self.tasks = []
         self.host = host
         self.username = username
+        self.port = port
         self.client = None
 
     def add_task(self, t):
@@ -22,7 +23,11 @@ class RemoteExecutor(object):
         '''Connects to remote computer and execute the tasks
         '''
         self.client = self._create_client()
-        self.client.connect(self.host, username=self.username)
+        if self.port:
+          self.client.connect(self.host, username=self.username, port=self.port)
+        else:
+          self.client.connect(self.host, username=self.username)
+
         for t in self.tasks:
             t.run(self.client)
         self.client.close()
