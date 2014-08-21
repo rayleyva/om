@@ -1,30 +1,30 @@
 # overseer-mini
 
-Minimal monitoring system. Monitors any machine without having to install any software - as long as you can SSH into it.
+Collect disk usage, memory and cpu load info on remote boxes without having to install any software - as long as you can SSH into it.
 
 
 ## Features
 
-- Monitoring multiple machines
-- Metrics: disk and memory usage
-- Email alerts
+- Disk and memory usage
+- CPU load
+- Supports email alerts when alerts get to a critical state (nearly full disk, low free memory, high cpu load, etc)
 
 
 ## Usage
 
-To collect metrics for a host:
+To collect usage for a host:
 
 ```shell
 $ ./om 192.168.0.1
 ```
 
-To collect metrics for multiple hosts (also supports hostnames):
+To collect usage for multiple hosts:
 
 ```shell
 $ ./om 192.168.0.2,box2
 ```
 
-Hostname also supports username, password and port if needed:
+The tool also supports username, password and port if needed:
 
 ```shell
 $ ./om root:mypass@mybox:44445
@@ -41,17 +41,19 @@ $ pip install -r requirements.txt
 $ ./om
 ```
 
-## Usage
+## Extra customization (optional)
 
-### Using a config file
+You can tweak the ssh and metrics settings by saving the configs into a json config file.
+
+Running against a config file:
 
 ```shell
 $ ./om -c <config.json>
 ```
 
-## Configuration
+### config.json format
 
-### Machines
+#### Machines
 
 The config file is a JSON and informs which machines are to be monitored.
 
@@ -71,7 +73,7 @@ The config file is a JSON and informs which machines are to be monitored.
 
 The only required field is ''host''. ''ssh'' is entirely optional if your local agent is already able to use keys to get to the machine.
 
-### Metrics
+#### Metrics
 
 The "metrics" section allows you to further customize your monitoring. Our current metrics are:
 
