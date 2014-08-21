@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from overseer.mini.config import ConfigLoader
-from overseer.mini.remote_executor import RemoteExecutor
+from overseer.mini.executor import Executor
 
 
 class Supervisor(object):
@@ -20,22 +20,20 @@ class Supervisor(object):
         self.running = True
 
         while self.running:
-            for host in self.config['hosts']:
-              self.collect_metrics(host)
+            map(self.collect_metrics, self.config['hosts'])
 
     def collect_metrics(self, host):
-        results = {}
+        results = []
 
         for plugin in self.metric_plugins:
-            results[plugin.name] = plugin.execute(plugin_executor, host)
+            results << plugin.execute(self.plugin_executor, host)
 
         self.handle_results(results)
 
-    def handle_results(self, results={}):
-        for plugin_name, result in results.iteritems():
-            interested_handlers = self.get_handlers(plugin_name, result)
+    def handle_results(self, results=[]):
+        for result in results:
+            interested_handlers = self.get_handlers(result)
             handler.handle(result) if handler is not None
-
 
     def get_handlers(self, plugin_result):
         '''Return a list of handlers interested on this plugin result

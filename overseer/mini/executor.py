@@ -3,7 +3,7 @@
 import paramiko
 import getpass
 
-class Remote(object):
+class Executor(object):
     '''Responsible for connecting and executing tasks remotely
 
     Connects to the remote computer and executes a list of overseer.mini.Task.
