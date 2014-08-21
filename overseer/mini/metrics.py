@@ -3,7 +3,7 @@
 from collections import namedtuple
 
 MetricPluginResult = namedtuple('MetricPluginResult', 'plugin host state value')
-PLUGIN_STATES = ['normal', 'warning', 'critical']
+PLUGIN_STATES = ['normal', 'critical']
 
 
 class MetricPlugin(object):
