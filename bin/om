@@ -3,7 +3,7 @@
 
 import sys
 
-from overseer.mini.supervisor import Supervisor
+from om.supervisor import Supervisor
 
 if __name__ == '__main__':
     supervisor = None

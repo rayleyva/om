@@ -4,8 +4,8 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-from overseer.mini.metrics import PLUGIN_STATES
-from overseer.mini.utils.logger import get_logger
+from om.metrics import PLUGIN_STATES
+from om.utils.logger import get_logger
 
 
 class Handler(object):

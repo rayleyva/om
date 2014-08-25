@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
 
-from overseer.mini.config import Config
-from overseer.mini.handler import StdoutHandler, MailHandler
-from overseer.mini.metrics import DiskUsage, MemoryUsage
-from overseer.mini.executor import Executor
-from overseer.mini.utils.logger import get_logger
+from om.config import Config
+from om.handler import StdoutHandler, MailHandler
+from om.metrics import DiskUsage, MemoryUsage
+from om.executor import Executor
+from om.utils.logger import get_logger
 
 log = get_logger("supervisor")
 
