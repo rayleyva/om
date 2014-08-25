@@ -10,35 +10,30 @@ Collect disk usage, memory and cpu load info on remote boxes without having to i
 - Supports email alerts when resources get to a critical state (e.g. nearly full disk, low free memory, high cpu load, etc)
 
 
+## Installation
+
+```shell
+$ pip install om
+```
+
 ## Usage
 
 To collect usage for a host:
 
 ```shell
-$ ./om 192.168.0.1
+$ om 192.168.0.1
 ```
 
 To collect usage for multiple hosts:
 
 ```shell
-$ ./om 192.168.0.2,box2
+$ om 192.168.0.2,box2
 ```
 
 The tool also supports username, password and port if needed:
 
 ```shell
-$ ./om root:mypass@mybox:44445
-```
-
-## Installation
-
-No packages have been released yet. For a development preview, please fetch the code:
-
-```shell
-$ git clone https://github.com/overseer-monitoring/om.git
-$ cd overseer-mini
-$ pip install -r requirements.txt
-$ ./om
+$ om root:mypass@mybox:44445
 ```
 
 ## Extra customization (optional)
@@ -48,7 +43,7 @@ You can tweak the ssh and metrics settings by saving the configs into a json con
 Running against a config file:
 
 ```shell
-$ ./om -c <config.json>
+$ om -c <config.json>
 ```
 
 ### config.json format
