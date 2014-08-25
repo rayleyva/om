@@ -1,4 +1,4 @@
-# overseer-mini
+# om
 
 Collect disk usage, memory and cpu load info on remote boxes without having to install any software - as long as you can SSH into it.
 
@@ -35,7 +35,7 @@ $ ./om root:mypass@mybox:44445
 No packages have been released yet. For a development preview, please fetch the code:
 
 ```shell
-$ git clone https://github.com/overseer-monitoring/overseer-mini.git
+$ git clone https://github.com/overseer-monitoring/om.git
 $ cd overseer-mini
 $ pip install -r requirements.txt
 $ ./om
