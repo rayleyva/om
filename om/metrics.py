@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 
-MetricPluginResult = namedtuple('MetricPluginResult', 'plugin host state value')
+MetricPluginResult = namedtuple('MetricPluginResult', 'host plugin state value')
 PLUGIN_STATES = ['normal', 'critical']
 
 
@@ -17,9 +17,9 @@ class MetricPlugin(object):
     def name(self):
         return type(self).__name__
 
-    def execute(self, remote, host):
+    def execute(self, machine):
         raise NotImplementedError('Run method not implemented in class %s' %
-                                  self.get_name())
+                                  self.name)
 
     def __unicode__(self):
         return self.name
@@ -41,14 +41,14 @@ class ShellMetricPlugin(MetricPlugin):
     def _output_parse(self, output, status):
         return output
 
-    def execute(self, remote, host):
-        output, status = remote.execute(self)
+    def execute(self, machine):
+        output, status = machine.executor.execute(self)
 
         # Middleware-like processing
         for processor in [self._status_check, self._output_parse]:
             output = processor(output, status)
 
-        return MetricPluginResult(self, host, self.state, output)
+        return MetricPluginResult(machine.executor.host, self, self.state, output)
 
 
 class DiskUsage(ShellMetricPlugin):
