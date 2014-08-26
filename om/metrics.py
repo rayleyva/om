@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import namedtuple
+from om.thresholds import NumericThresholdCreatorMixin, EnumThresholdCreatorMixin
 
 class Metric(object):
 
@@ -15,7 +16,7 @@ class Metric(object):
         for key, metrics in self.values.iteritems():
             for m, value in metrics.iteritems():
                 if self.thresholds.get(m) is None: continue
-                if value > self.thresholds.get(m):
+                if not self.thresholds.get(m).check_value (value):
                     return 'critical'
         return 'normal'
 
@@ -36,11 +37,11 @@ class Plugin(object):
 
 
 class ShellPlugin(Plugin):
-    thresholds = {}
+    default_thresholds = {}
 
     def __init__(self, **kwargs):
         super(ShellPlugin, self).__init__(**kwargs)
-        self.thresholds = kwargs.get('thresholds', self.thresholds)
+        self.create_thresholds(kwargs.get('thresholds', self.default_thresholds))
 
     @property
     def command(self):
@@ -63,11 +64,11 @@ class ShellPlugin(Plugin):
         return Metric(executor.host, self, output, self.thresholds)
 
 
-class DiskUsage(ShellPlugin):
+class DiskUsage(ShellPlugin, NumericThresholdCreatorMixin):
     '''Verifies disk usage
     '''
     name = 'disk_usage'
-    thresholds = {'usage': 80}
+    default_thresholds = {'usage': 80}
 
     @property
     def command(self):
@@ -87,11 +88,11 @@ class DiskUsage(ShellPlugin):
         return values
 
 
-class MemoryUsage(ShellPlugin):
+class MemoryUsage(ShellPlugin, NumericThresholdCreatorMixin):
     '''Verifies memory usage
     '''
     name = 'memory_usage'
-    thresholds = {'usage': 70}
+    default_thresholds = {'usage': 70}
 
     @property
     def command(self):
@@ -105,11 +106,11 @@ class MemoryUsage(ShellPlugin):
         return {'system' : {'used': used, 'free': free, 'total': total, 'usage': usage}}
 
 
-class CPULoad(ShellPlugin):
+class CPULoad(ShellPlugin, NumericThresholdCreatorMixin):
     '''Verifies CPU load
     '''
     name = 'cpu_load'
-    thresholds = {'avg_1min': 25, 'avg_5min': 50, 'avg_15min': 75}
+    default_thresholds = {'avg_1min': 25, 'avg_5min': 50, 'avg_15min': 75}
 
     @property
     def command(self):
@@ -119,10 +120,12 @@ class CPULoad(ShellPlugin):
         return {'system' : dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))}
 
 
-class ProcessState(ShellPlugin):
+class ProcessState(ShellPlugin, EnumThresholdCreatorMixin):
     '''Verifies if a process is running
     '''
     name = 'process_state'
+    default_thresholds = {'status' : {'good' : ['running'],
+                                      'bad' : ['not-running']}}
 
     def __init__(self, **kwargs):
         super(ProcessState, self).__init__(**kwargs)
