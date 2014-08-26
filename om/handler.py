@@ -6,6 +6,8 @@ from email.MIMEText import MIMEText
 
 from om.utils.logger import get_logger
 
+log = get_logger("metrics")
+
 
 class Handler(object):
     '''Base class for handlers
@@ -50,11 +52,10 @@ class StdoutHandler(Handler):
         return True
 
     def handle(self, metric):
-        log = get_logger("metric:%s:%s:%s" % (metric.host, metric.plugin.name, metric.state))
         if metric.state == 'critical':
-            log.error("%s" % (metric.values))
+            log.error("%s:%s:%s %s" % (metric.host, metric.plugin.name, metric.state, metric.values))
         else:
-            log.debug("%s" % (metric.values))
+            log.debug("%s:%s:%s %s" % (metric.host, metric.plugin.name, metric.state, metric.values))
 
 
 class MailHandler(Handler):
