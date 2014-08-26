@@ -7,8 +7,8 @@
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
 - [Configuration File](#configuration-file)
-  - Specifying Machines
-  - Plugins
+  - [Specifying Machines](#specifying-machines)
+  - [Plugins](#plugins)
 - [Contributing to om](#contributing-to-om)
 - [Hacking on om](#hacking-on-om)
 - [License](#license)
@@ -74,10 +74,12 @@ The only required field is ''host''. ''ssh'' is entirely optional if your local 
 
 ### Plugins
 
-The "metrics" section allows you to further customize your monitoring. Our current metrics are:
+The "plugins" section allows you to further customize your monitoring. Our current plugins are:
 
 - disk_usage
 - memory_usage
+- cpu_load
+- process_state
 
 For instance, disk usages are reported as critical when they reach 80% usage. If for a certain box you want to be critical when it reaches 50%, then:
 
@@ -86,7 +88,7 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
   "machines": {
     "my_rails_app": {
       "host": "125.22.13.12",
-      "metrics": {
+      "plugins": {
         "disk_usage": {
           "thresholds": {
             "usage": "50%"
@@ -115,7 +117,7 @@ You can also override the default value globally:
       }
     }
   },
-  "metrics": {
+  "plugins": {
     "disk_usage": {
       "thresholds": {
         "usage": "50%"
