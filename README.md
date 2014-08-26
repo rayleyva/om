@@ -84,7 +84,9 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
       "host": "125.22.13.12",
       "metrics": {
         "disk_usage": {
-          "critical": "50%"
+          "thresholds": {
+            "usage": "50%"
+          }
         }
       }
     }
@@ -103,13 +105,17 @@ You can also override the default value globally:
     "my_postgres": {
       "host": "postgresbox",
       "disk_usage": {
-        "critical": "60%"
+        "thresholds": {
+          "usage": "60%"
+        }
       }
     }
   },
   "metrics": {
     "disk_usage": {
-      "critical": "50%"
+      "thresholds": {
+        "usage": "50%"
+      }
     }
   }
 }
