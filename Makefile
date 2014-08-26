@@ -6,6 +6,9 @@ init:
 clean:
 	rm -rf dist/
 
+test:
+	echo "TBD"
+
 publish:
 	python setup.py register
 	python setup.py sdist upload
