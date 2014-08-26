@@ -1,12 +1,26 @@
 # om
 
+## Table of Contents
+
+- [What is om?](#what-is-om)
+  - [Features](#features)
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Configuration File](#configuration-file)
+  - Specifying Machines
+  - Plugins
+- [Contributing to om](#contributing-to-om)
+- [Hacking on om](#hacking-on-om)
+- [License](#license)
+- [Copyright](#copyright)
+
+## What is om?
+
 Collect disk usage, memory and cpu load info on remote boxes without having to install any software - as long as you can SSH into it.
 
+### Features
 
-## Features
-
-- Disk and memory usage
-- CPU load
+- CPU load, disk and memory usage
 - Supports email alerts when resources get to a critical state (e.g. nearly full disk, low free memory, high cpu load, etc)
 
 
@@ -16,7 +30,7 @@ Collect disk usage, memory and cpu load info on remote boxes without having to i
 $ pip install om
 ```
 
-## Usage
+## Basic Usage
 
 To collect usage for a host:
 
@@ -36,19 +50,9 @@ The tool also supports username, password and port if needed:
 $ om root:mypass@mybox:44445
 ```
 
-## Extra customization (optional)
+## Configuration File
 
-You can tweak the ssh and metrics settings by saving the configs into a json config file.
-
-Running against a config file:
-
-```shell
-$ om -c <config.json>
-```
-
-### config.json format
-
-#### Machines
+### Specifying Machines
 
 The config file is a JSON and informs which machines are to be monitored.
 
@@ -68,7 +72,7 @@ The config file is a JSON and informs which machines are to be monitored.
 
 The only required field is ''host''. ''ssh'' is entirely optional if your local agent is already able to use keys to get to the machine.
 
-#### Metrics
+### Plugins
 
 The "metrics" section allows you to further customize your monitoring. Our current metrics are:
 
@@ -120,3 +124,44 @@ You can also override the default value globally:
   }
 }
 ```
+
+## Contributing to om
+
+You're encouraged to submit issues, PRs and weigh in with your opinion anywhere. If you want to know how to get started,
+feel free to contact the authors either directly or through a new issue. We also love documentation so feel free to extend
+this README.
+
+## Hacking on om
+
+Hacking locally is really easy. First clone the repository:
+
+```shell
+$ git clone https://github.com/overseer-monitoring/om.git
+```
+
+Install the requirements (we provide a quick makefile for that):
+
+```shell
+$ make
+```
+
+Run the daemon on a host:
+
+```shell
+$ cd om
+$ PYTHONPATH=. ./bin/om <host>
+```
+
+Run tests:
+
+```shell
+$ make test
+```
+
+## License
+
+LGPLv3 License. See LICENSE for details.
+
+## Copyright
+
+Copyright (c) 2014 André Dieb, Thiago Sousa Santos
