@@ -2,7 +2,6 @@
 
 from collections import namedtuple
 
-
 class Metric(object):
 
     def __init__(self, host, plugin, values={}, thresholds={}):
@@ -109,3 +108,11 @@ class CPULoad(ShellPlugin):
 
     def _output_parse(self, output, status):
         return dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))
+
+PLUGINS_LIST = [DiskUsage, CPULoad, MemoryUsage, ProcessState]
+def list_plugins():
+    return PLUGINS_LIST
+
+DEFAULT_PLUGINS = [CPULoad, DiskUsage, MemoryUsage]
+def list_default_plugins():
+    return DEFAULT_PLUGINS
