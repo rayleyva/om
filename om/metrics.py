@@ -38,6 +38,10 @@ class Plugin(object):
 class ShellPlugin(Plugin):
     thresholds = {}
 
+    def __init__(self, **kwargs):
+        super(ShellPlugin, self).__init__(**kwargs)
+        self.thresholds = kwargs.get('thresholds', self.thresholds)
+
     @property
     def command(self):
         raise NotImplementedError()
