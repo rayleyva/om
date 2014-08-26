@@ -118,6 +118,7 @@ class CPULoad(ShellPlugin):
     def _output_parse(self, output, status):
         return {'system' : dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))}
 
+
 class ProcessState(ShellPlugin):
     '''Verifies if a process is running
     '''
@@ -144,6 +145,7 @@ class ProcessState(ShellPlugin):
                     return {self.process_name : {'status' : 'running'}}
 
         return {self.process_name : {'status' : 'not-running'}}
+
 
 PLUGINS_LIST = [DiskUsage, CPULoad, MemoryUsage, ProcessState]
 def list_plugins():
