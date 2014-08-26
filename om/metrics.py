@@ -27,7 +27,7 @@ class Plugin(object):
     def __init__(self, *args, **kwargs):
         super(Plugin,self).__init__() #swallow arguments
 
-    def execute(self, machine):
+    def execute(self, executor):
         raise NotImplementedError('Execute method must be implemented')
 
     def __repr__(self):
@@ -48,14 +48,14 @@ class ShellPlugin(Plugin):
     def _output_parse(self, output, status):
         return output
 
-    def execute(self, machine):
-        output, status = machine.executor.execute(self)
+    def execute(self, executor):
+        output, status = executor.execute(self)
 
         # Middleware-like processing
         for processor in [self._status_check, self._output_parse]:
             output = processor(output, status)
 
-        return Metric(machine.executor.host, self, output, self.thresholds)
+        return Metric(executor.host, self, output, self.thresholds)
 
 
 class DiskUsage(ShellPlugin):

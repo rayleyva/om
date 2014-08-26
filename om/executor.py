@@ -20,6 +20,7 @@ class Executor(object):
         self.use_local_keys = use_local_keys
         self.autoadd_unknown_hosts = autoadd_unknown_hosts
         self.options = options
+        self.client = None
 
     def _get_connection_optional_args(self):
         args = {}
@@ -37,17 +38,26 @@ class Executor(object):
             client.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
         return client
 
-    def execute(self, plugin):
-        client = self.get_client()
+    def start(self):
+        if self.client:
+            return
+        self.client = self.get_client()
         optional_args = self._get_connection_optional_args()
-        client.connect(self.host, port=self.port, username=self.username,
-                       **optional_args)
+        self.client.connect(self.host, port=self.port, username=self.username,
+                            **optional_args)
 
-        stdin, stdout, stderr = client.exec_command(plugin.command)
+    def stop(self):
+        self.client.close()
+        self.client = None
+
+    def execute(self, plugin):
+        self.start() #always try, it will be a NOP if already started
+
+        stdin, stdout, stderr = self.client.exec_command(plugin.command)
         output = stdout.readlines()
         stderr = stderr.readlines()
         status = stdout.channel.recv_exit_status()
-        client.close()
+
         return output, status
 
     def __repr__(self):
