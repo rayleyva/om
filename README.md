@@ -1,5 +1,8 @@
 # om
 
+[![Build Status](https://travis-ci.org/overseer-monitoring/om.svg?branch=master)](https://travis-ci.org/overseer-monitoring/om)
+[![PyPI version](https://badge.fury.io/py/om.svg)](http://badge.fury.io/py/om)
+
 ## Table of Contents
 
 - [What is om?](#what-is-om)
