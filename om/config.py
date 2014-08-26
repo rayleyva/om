@@ -44,14 +44,14 @@ class Config(object):
     def machines(self):
         if not self._machines:
             self._machines = []
-            global_metrics = self.get('metrics', {})
+            global_metrics = self.get('plugins', {})
             global_ssh = self.get('ssh', {})
 
             for machine, config in self.get('machines', {}).iteritems():
                 machine_host = config.get('host')
                 machine_ssh = config.get('ssh', global_ssh)
                 machine_metrics = global_metrics.copy()
-                machine_metrics.update(config.get('metrics', {}))
+                machine_metrics.update(config.get('plugins', {}))
 
                 self._machines.append(Machine(machine_host, machine_ssh, machine_metrics))
 
