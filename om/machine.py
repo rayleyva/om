@@ -12,17 +12,17 @@ class Machine(object):
 
     def __init__(self, host, machine_ssh, machine_metrics):
         self.executor = Executor(host, **machine_ssh)
-        self.plugins = self._load_plugins(machine_metrics)
+        self.plugins = Machine.load_plugins(machine_metrics)
 
     def run_plugins(self):
         return [plugin.execute(self) for plugin in self.plugins]
 
-    def _load_plugins(self, configs):
-        return [self._load_plugin(klass, configs) for klass in self.DEFAULT_PLUGINS]
-
-    def _load_plugin(self, plugin, configs):
-        return plugin(**configs.get(plugin.name_on_config, {}))
-
     def __repr__(self):
         return "<Machine executor='%s' plugins=%s>" % \
                (self.executor, self.plugins)
+
+    @staticmethod
+    def load_plugins(configs, plugins=DEFAULT_PLUGINS):
+        load = lambda plugin: plugin(**configs.get(plugin.name_on_config, {}))
+        return map(load, plugins)
+
