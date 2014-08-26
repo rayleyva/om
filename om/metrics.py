@@ -12,10 +12,11 @@ class Metric(object):
 
     @property
     def state(self):
-        for key, value in self.values.iteritems():
-            if self.thresholds.get(key): continue
-            if value > self.thresholds.get(key):
-                return 'critical'
+        for key, metrics in self.values.iteritems():
+            for m, value in metrics.iteritems():
+                if self.thresholds.get(m) is None: continue
+                if value > self.thresholds.get(m):
+                    return 'critical'
         return 'normal'
 
 class Plugin(object):
@@ -77,7 +78,7 @@ class DiskUsage(ShellPlugin):
 
             if name == 'none': continue
 
-            values[name] = usage
+            values[name] = {'usage' : usage}
 
         return values
 
@@ -97,7 +98,7 @@ class MemoryUsage(ShellPlugin):
         used, free = int(used), int(free)
         total = used + free
         usage = 100 * used/float(total)
-        return {'used': used, 'free': free, 'total': total, 'usage': usage}
+        return {'system' : {'used': used, 'free': free, 'total': total, 'usage': usage}}
 
 
 class CPULoad(ShellPlugin):
@@ -111,7 +112,7 @@ class CPULoad(ShellPlugin):
         return u'cat /proc/loadavg'
 
     def _output_parse(self, output, status):
-        return dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))
+        return {'system' : dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))}
 
 class ProcessState(ShellPlugin):
     '''Verifies if a process is running
@@ -136,9 +137,9 @@ class ProcessState(ShellPlugin):
             for line in output:
                 tokens = line.strip().split()
                 if tokens[-1] == self.process_name:
-                    return {'status' : 'running'}
+                    return {self.process_name : {'status' : 'running'}}
 
-        return {'status' : 'not-running'}
+        return {self.process_name : {'status' : 'not-running'}}
 
 PLUGINS_LIST = [DiskUsage, CPULoad, MemoryUsage, ProcessState]
 def list_plugins():
