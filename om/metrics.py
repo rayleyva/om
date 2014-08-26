@@ -35,6 +35,7 @@ class Plugin(object):
 
 
 class ShellPlugin(Plugin):
+    thresholds = {}
 
     @property
     def command(self):
