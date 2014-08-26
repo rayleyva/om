@@ -6,6 +6,10 @@
   - [Features](#features)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
+  - [Running om on a host](#running-om-on-a-host)
+  - [Running om on multiple hosts](#running-om-on-multiple-hosts)
+  - [SSH username, password and port](#ssh-username-password-and-port)
+  - [Running om using a configuration file](#running-om-using-a-configuration-file)
 - [Configuration File](#configuration-file)
   - [Specifying Machines](#specifying-machines)
   - [Plugins](#plugins)
@@ -32,22 +36,28 @@ $ pip install om
 
 ## Basic Usage
 
-To collect usage for a host:
+### Running om on a host
 
 ```shell
 $ om 192.168.0.1
 ```
 
-To collect usage for multiple hosts:
+### Running om on multiple hosts
 
 ```shell
 $ om 192.168.0.2,box2
 ```
 
-The tool also supports username, password and port if needed:
+### SSH username, password and port
 
 ```shell
 $ om root:mypass@mybox:44445
+```
+
+### Running om using a [configuration file](#configuration-file)
+
+```shell
+$ om -c <config.json>
 ```
 
 ## Configuration File
