@@ -2,8 +2,8 @@
 import time
 
 from om.config import Config
-from om.handler import StdoutHandler, MailHandler
 from om.machine import Machine
+from om.handler import Handler
 from om.utils.logger import get_logger
 
 log = get_logger("supervisor")
@@ -18,7 +18,6 @@ class Supervisor(object):
     def __init__(self, config_file=None):
         self.running = False
         self.config = Config(config_file)
-        self._load_handlers()
         self._load_machines()
 
     def run(self):
@@ -30,27 +29,15 @@ class Supervisor(object):
 
     def collect_metrics(self, machine):
         log.info("collecting metrics for machine=%s" % machine)
-        results = machine.run_plugins()
-        self.handle_results(results)
+        self.handle_results(machine.run_plugins())
 
     def handle_results(self, results=[]):
-        for result in results:
-            interested_handlers = self.get_handlers(result)
-            for handler in interested_handlers:
-                handler.handle(result)
+        [map(Handler._handle(result), self.derive_handlers(result)) for result in results]
 
-    def get_handlers(self, plugin_result):
+    def derive_handlers(self, result):
         '''Return a list of handlers interested on this plugin result
         '''
-        return [handler for handler in self.handlers if handler.handles(plugin_result)]
-
-    def _load_handlers(self):
-        self.handlers = [StdoutHandler()]
-        for handler, config in self.config.get('handlers', {}).iteritems():
-            if handler == 'email':
-                self.handlers.append(MailHandler(**config))
-
-        log.debug('loaded handlers %s' % self.handlers)
+        return filter(Handler._handles(result), self.config.handlers)
 
     def _load_machines(self):
         self.machines = []

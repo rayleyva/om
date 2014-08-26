@@ -4,7 +4,6 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
-from om.metrics import PLUGIN_STATES
 from om.utils.logger import get_logger
 
 
@@ -13,6 +12,14 @@ class Handler(object):
     '''
     def __init__(self):
         self._enabled = True
+
+    @classmethod
+    def _handles(cls, result):
+        return lambda handler: handler.handles(result)
+
+    @classmethod
+    def _handle(cls, result):
+        return lambda handler: handler.handle(result)
 
     @property
     def enabled(self):
@@ -23,12 +30,12 @@ class Handler(object):
         self._enabled = value
         return self._enabled
 
-    def handles(self, plugin_result):
+    def handles(self, metric):
         '''Returns True if this handler handles this result
         '''
         return False
 
-    def handle(self, plugin_result):
+    def handle(self, metric):
         raise NotImplementedError
 
     def __repr__(self):
@@ -39,15 +46,15 @@ class StdoutHandler(Handler):
     '''Outputs all metrics to stdout
     '''
 
-    def handles(self, plugin_result):
+    def handles(self, metric):
         return True
 
-    def handle(self, plugin_result):
-        log = get_logger("metric:%s:%s:%s" % (plugin_result.host, plugin_result.plugin.name_on_config, plugin_result.state))
-        if plugin_result.state == 'critical':
-            log.error("%s" % (plugin_result.value))
+    def handle(self, metric):
+        log = get_logger("metric:%s:%s:%s" % (metric.host, metric.plugin.name, metric.state))
+        if metric.state == 'critical':
+            log.error("%s" % (metric.values))
         else:
-            log.debug("%s" % (plugin_result.value))
+            log.debug("%s" % (metric.values))
 
 
 class MailHandler(Handler):
@@ -56,19 +63,19 @@ class MailHandler(Handler):
     def __init__(self, **kwargs):
         self.config = kwargs
 
-    def handles(self, plugin_result):
+    def handles(self, metric):
         return True
 
-    def handle(self, plugin_result):
-        if plugin_result.state != 'normal': self.send_alert(plugin_result)
+    def handle(self, metric):
+        if metric.state != 'normal': self.send_alert(metric)
 
-    def send_alert(self, plugin_result):
+    def send_alert(self, metric):
         server = smtplib.SMTP(self.config['smtp'], self.config['port'])
         if self.config.get('security', '') == 'starttls':
             server.starttls()
         server.login(self.config['login'], self.config['password'])
 
-        body = "%s.%s: %s (%s)" % (plugin_result.host, plugin_result.plugin.name, plugin_result.value, plugin_result.state)
+        body = "%s.%s: %s (%s)" % (metric.host, metric.plugin.name, metric.values, metric.state)
 
         fromaddr = self.config['from']
         toaddr = ', '.join(self.config['to'])
