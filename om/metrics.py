@@ -116,3 +116,23 @@ class MemoryUsage(ShellMetricPlugin):
             message += "memory usage %.2f%% (used=%d, free=%d)." % (usage, used, free)
 
         return message
+
+
+class CPULoad(ShellMetricPlugin):
+    '''Verifies CPU load
+    '''
+    name_on_config = 'cpu_load'
+    critical = [25, 50, 75]
+
+    def __init__(self, critical=critical):
+        assert isinstance(self.critical, list)
+        self.critical = critical
+
+    @property
+    def command(self):
+        return u'cat /proc/loadavg'
+
+    def _output_parse(self, output, status):
+        avgs = [float(avg) for avg in output[0].split()[:3]]
+        self.state = 'normal'
+        return avgs

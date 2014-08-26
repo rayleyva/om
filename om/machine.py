@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from om.metrics import DiskUsage, MemoryUsage
+from om.metrics import CPULoad, DiskUsage, MemoryUsage
 from om.executor import Executor
 from om.utils.logger import get_logger
 
@@ -8,7 +8,7 @@ log = get_logger("machine")
 
 
 class Machine(object):
-    DEFAULT_PLUGINS = [DiskUsage, MemoryUsage]
+    DEFAULT_PLUGINS = [CPULoad, DiskUsage, MemoryUsage]
 
     def __init__(self, host, machine_ssh, machine_metrics):
         self.executor = Executor(host, **machine_ssh)
