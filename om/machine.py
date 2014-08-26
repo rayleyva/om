@@ -23,6 +23,6 @@ class Machine(object):
 
     @staticmethod
     def load_plugins(configs, plugins=DEFAULT_PLUGINS):
-        load = lambda plugin: plugin(**configs.get(plugin.name_on_config, {}))
+        load = lambda plugin: plugin(**configs.get(plugin.name, {}))
         return map(load, plugins)
 
