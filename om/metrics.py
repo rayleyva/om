@@ -2,33 +2,37 @@
 
 from collections import namedtuple
 
-MetricPluginResult = namedtuple('MetricPluginResult', 'host plugin state value')
-PLUGIN_STATES = ['normal', 'critical']
 
+class Metric(object):
 
-class MetricPlugin(object):
-    '''Base class for all metrics
-    '''
-
-    def __init__(self, **kwargs):
-        pass
+    def __init__(self, host, plugin, values={}, thresholds={}):
+        self.host = host
+        self.plugin = plugin
+        self.values = values
+        self.thresholds = thresholds
 
     @property
-    def name(self):
-        return type(self).__name__
+    def state(self):
+        for key, value in self.values.iteritems():
+            if self.thresholds.get(key): continue
+            if value > self.thresholds.get(key):
+                return 'critical'
+        return 'normal'
+
+class Plugin(object):
+    '''Base class for all metrics
+    '''
+    PLUGIN_STATES = ['normal', 'critical']
+    name = ''
 
     def execute(self, machine):
-        raise NotImplementedError('Run method not implemented in class %s' %
-                                  self.name)
-
-    def __unicode__(self):
-        return self.name
+        raise NotImplementedError('Execute method must be implemented')
 
     def __repr__(self):
-        return "<Metric name='%s'>" % (self.name_on_config)
+        return "<Plugin name='%s'>" % (self.name)
 
 
-class ShellMetricPlugin(MetricPlugin):
+class ShellPlugin(Plugin):
 
     @property
     def command(self):
@@ -48,27 +52,21 @@ class ShellMetricPlugin(MetricPlugin):
         for processor in [self._status_check, self._output_parse]:
             output = processor(output, status)
 
-        return MetricPluginResult(machine.executor.host, self, self.state, output)
+        return Metric(machine.executor.host, self, output, self.thresholds)
 
 
-class DiskUsage(ShellMetricPlugin):
+class DiskUsage(ShellPlugin):
     '''Verifies disk usage
     '''
-    name_on_config = 'disk_usage'
-    critical = 80
-
-    def __init__(self, critical=critical):
-        if isinstance(critical, unicode):
-            critical = int(critical.replace('%', ''))
-        self.critical = critical
+    name = 'disk_usage'
+    thresholds = {'usage': 80}
 
     @property
     def command(self):
         return u'df -PT'
 
     def _output_parse(self, output, status):
-        message = ''
-        self.state = 'normal'
+        values = {}
 
         for line in output[1:]:
             name, fstype, blocks, used, avail, usage, mnt = line.split()
@@ -76,63 +74,38 @@ class DiskUsage(ShellMetricPlugin):
 
             if name == 'none': continue
 
-            if usage >= self.critical:
-                message += "disk %s usage has reached critical: %d%% (over %d%%). " % (name, usage, self.critical)
-                self.state = 'critical'
-            else:
-                message += "disk %s usage: %d%% (used=%s, avail=%s). " % (name, usage, used, avail)
+            values[name] = usage
 
-        return message
+        return values
 
 
-class MemoryUsage(ShellMetricPlugin):
+class MemoryUsage(ShellPlugin):
     '''Verifies memory usage
     '''
-    name_on_config = 'memory_usage'
-    critical = 70
-
-    def __init__(self, critical=critical):
-        if isinstance(critical, unicode):
-            critical = int(critical.replace('%', ''))
-        self.critical = critical
+    name = 'memory_usage'
+    thresholds = {'usage': 70}
 
     @property
     def command(self):
         return u'free -m | grep buffers/cache'
 
     def _output_parse(self, output, status):
-        message = ''
-        self.state = 'normal'
-
         _, _, used, free = output[0].split()
         used, free = int(used), int(free)
         total = used + free
         usage = 100 * used/float(total)
-
-        if usage >= self.critical:
-            message += "memory usage has reached critical: %d%% (over %d%%)." % (name, usage, self.critical)
-            self.state = 'critical'
-        else:
-            message += "memory usage %.2f%% (used=%d, free=%d)." % (usage, used, free)
-
-        return message
+        return {'used': used, 'free': free, 'total': total, 'usage': usage}
 
 
-class CPULoad(ShellMetricPlugin):
+class CPULoad(ShellPlugin):
     '''Verifies CPU load
     '''
-    name_on_config = 'cpu_load'
-    critical = [25, 50, 75]
-
-    def __init__(self, critical=critical):
-        assert isinstance(self.critical, list)
-        self.critical = critical
+    name = 'cpu_load'
+    thresholds = {'avg_1min': 25, 'avg_5min': 50, 'avg_15min': 75}
 
     @property
     def command(self):
         return u'cat /proc/loadavg'
 
     def _output_parse(self, output, status):
-        avgs = [float(avg) for avg in output[0].split()[:3]]
-        self.state = 'normal'
-        return avgs
+        return dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))
