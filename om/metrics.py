@@ -24,6 +24,9 @@ class Plugin(object):
     PLUGIN_STATES = ['normal', 'critical']
     name = ''
 
+    def __init__(self, *args, **kwargs):
+        super(Plugin,self).__init__() #swallow arguments
+
     def execute(self, machine):
         raise NotImplementedError('Execute method must be implemented')
 
