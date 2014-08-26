@@ -17,17 +17,11 @@ class Machine(object):
     def run_plugins(self):
         return [plugin.execute(self) for plugin in self.plugins]
 
-    def _load_plugins(self, machine_metrics):
-        plugin_classes = self.DEFAULT_PLUGINS
-        plugin_instances = []
+    def _load_plugins(self, configs):
+        return [self._load_plugin(klass, configs) for klass in self.DEFAULT_PLUGINS]
 
-        for plugin_class in plugin_classes:
-            plugin_name = plugin_class.name_on_config
-            overrides = machine_metrics.get(plugin_name, {})
-            plugin_instances.append(plugin_class(**overrides))
-
-        log.debug('loaded plugins %s' % plugin_instances)
-        return plugin_instances
+    def _load_plugin(self, plugin, configs):
+        return plugin(**configs.get(plugin.name_on_config, {}))
 
     def __repr__(self):
         return "<Machine executor='%s' plugins=%s>" % \
