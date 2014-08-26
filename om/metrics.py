@@ -113,6 +113,33 @@ class CPULoad(ShellPlugin):
     def _output_parse(self, output, status):
         return dict(zip(['avg_1min', 'avg_5min', 'avg_15min'], [float(avg) for avg in output[0].split()[:3]]))
 
+class ProcessState(ShellPlugin):
+    '''Verifies if a process is running
+    '''
+    name = 'process_state'
+
+    def __init__(self, **kwargs):
+        #super(ProcessState, self).__init__(self)
+        self.process_name = kwargs.get('process_name', '')
+        if not self.process_name:
+            pass #TODO raise exception
+
+    def _status_check(self, output, status):
+        return output #ignore status
+
+    @property
+    def command(self):
+        return u'ps cax | grep %s' % (self.process_name)
+
+    def _output_parse(self, output, status):
+        if output:
+            for line in output:
+                tokens = line.strip().split()
+                if tokens[-1] == self.process_name:
+                    return {'status' : 'running'}
+
+        return {'status' : 'not-running'}
+
 PLUGINS_LIST = [DiskUsage, CPULoad, MemoryUsage, ProcessState]
 def list_plugins():
     return PLUGINS_LIST
