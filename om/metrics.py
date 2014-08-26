@@ -119,7 +119,7 @@ class ProcessState(ShellPlugin):
     name = 'process_state'
 
     def __init__(self, **kwargs):
-        #super(ProcessState, self).__init__(self)
+        super(ProcessState, self).__init__(**kwargs)
         self.process_name = kwargs.get('process_name', '')
         if not self.process_name:
             pass #TODO raise exception
