@@ -6,7 +6,6 @@ from om.utils.logger import get_logger
 
 log = get_logger("machine")
 
-
 class Machine(object):
 
     def __init__(self, host, machine_ssh, machine_metrics):
@@ -33,4 +32,8 @@ class Machine(object):
             pnames = configs.keys()
             plugins = [p for p in list_plugins() if p.name in pnames]
         load = lambda plugin: plugin(**configs.get(plugin.name, {}))
-        return map(load, plugins)
+        instances = []
+        for p_klass in plugins:
+            for c in configs.get(p_klass.name, {}):
+                instances.append(p_klass(**c))
+        return instances
