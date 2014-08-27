@@ -83,33 +83,29 @@ Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 ```json
 {
   "hosts": {
-    /* Hosts go here (required) */
+    # Hosts go here (required)
 
     "host1": {
 
-      # IP or hostname goes here
+      # IP or hostname goes here (required)
       "host": "179.25.15.2",
 
       "ssh": {
-        # Host-specific SSH settings go here
-        # (optional)
+        # Host-specific SSH settings go here (optional)
       }
 
       "plugins": {
-        # Host specific plugin configurations go here
-        # (optional)
+        # Host specific plugin configurations go here (optional)
       }
     }
   },
 
   "ssh": {
-    # Global SSH settings go here
-    # (optional)
+    # Global SSH settings go here (optional)
   },
 
   "plugins": {
-    # Global plugin configurations go here
-    # (optional)
+    # Global plugin configurations go here (optional)
   }
 }
 ```
