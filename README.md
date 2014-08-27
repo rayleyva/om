@@ -11,8 +11,8 @@
 - [Basic Usage](#basic-usage)
   - [Running om](#running-om-on-a-host)
   - [Running om on Multiple Hosts](#running-om-on-multiple-hosts)
-  - [Custom SSH user, password and port](#ssh-username-password-and-port)
-  - [Using a Configuration File](#running-om-using-a-configuration-file)
+  - [Custom SSH user, password and port](#custom-ssh-username-password-and-port)
+  - [Using a Configuration File](#using-a-configuration-file)
 - [Configuration File](#configuration-file)
   - [Quick Reference](#quick-reference)
   - [Monitoring a Process](#processes)
@@ -86,7 +86,6 @@ Hosts allow host-specific settings for SSH and plugins for more advanced setups.
     # Hosts go here (required)
 
     "host1": {
-
       # IP or hostname goes here (required)
       "host": "179.25.15.2",
 
