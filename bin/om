@@ -61,7 +61,7 @@ def parse_machine(machine):
         if ':' in userpart:
             config['ssh']['username'], config['ssh']['password'] = userpart.split(':')
         else:
-            config['username'] = userpart
+            config['ssh']['username'] = userpart
 
     if ':' in machine:
         config['host'], config['ssh']['port'] = machine.split(':')
