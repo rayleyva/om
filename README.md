@@ -141,7 +141,13 @@ Checking if a process ''nginx'' is running:
 
       "plugins": {
         "process_state": {
-          "process_name": "nginx"
+          "proxy": {
+            "process": "nginx"
+          },
+
+          "rails_web_worker": {
+            "process": "unicorn"
+          }
         }
       }
     }
@@ -201,8 +207,6 @@ You can also override the default value globally:
   }
 }
 ```
-
-### Monitoring processes
 
 ## Contributing to om
 
