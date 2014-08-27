@@ -83,8 +83,7 @@ Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 ```json
 {
   "hosts": {
-    # Hosts go here
-    # (required)
+    /* Hosts go here (required) */
 
     "host1": {
 
