@@ -98,3 +98,7 @@ class MailHandler(Handler):
         msg.attach(MIMEText(body, "plain"))
 
         server.sendmail(fromaddr, toaddr, msg.as_string())
+
+HANDLERS = [MailHandler, JSONStdoutHandler, StdoutHandler]
+def list_handlers():
+    return HANDLERS

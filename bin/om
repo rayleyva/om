@@ -90,10 +90,13 @@ def list_plugins():
     print 'Available plugins:'
     for plugin in list_plugins():
         print "\t%s" % plugin.name
-    print '\nDefault plugins: %s' % [p.name for p in list_default_plugins()]
+    print '\nDefault plugins: %s' % ', '.join([p.name for p in list_default_plugins()])
 
 def list_handlers():
-    print 'TODO'
+    from om.handler import list_handlers
+    print 'Available handlers:'
+    for handler in list_handlers():
+        print "\t%s" % handler.__name__
 
 if __name__ == '__main__':
     supervisor = None
