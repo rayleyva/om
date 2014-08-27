@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from om.metrics import list_plugins, list_default_plugins
+from om.plugin import list_plugins, list_default_plugins
 from om.executor import Executor
 from om.utils.logger import get_logger
 
