@@ -80,7 +80,7 @@ include ''ssh'' and ''plugins'' sections for global configuration of SSH (userna
 
 Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 
-```json
+```ruby
 {
   "hosts": {
     # Hosts go here (required)
