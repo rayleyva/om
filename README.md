@@ -9,12 +9,13 @@
   - [Features](#features)
 - [Installation](#installation)
 - [Basic Usage](#basic-usage)
-  - [Running om on a host](#running-om-on-a-host)
-  - [Running om on multiple hosts](#running-om-on-multiple-hosts)
-  - [SSH username, password and port](#ssh-username-password-and-port)
-  - [Running om using a configuration file](#running-om-using-a-configuration-file)
+  - [Running om](#running-om-on-a-host)
+  - [Running om on Multiple Hosts](#running-om-on-multiple-hosts)
+  - [Custom SSH user, password and port](#ssh-username-password-and-port)
+  - [Using a Configuration File](#running-om-using-a-configuration-file)
 - [Configuration File](#configuration-file)
-  - [Specifying Machines](#specifying-machines)
+  - [Quick Reference](#quick-reference)
+  - [Monitoring a Process](#processes)
   - [Plugins](#plugins)
 - [Contributing to om](#contributing-to-om)
 - [Hacking on om](#hacking-on-om)
@@ -39,25 +40,25 @@ $ pip install om
 
 ## Basic Usage
 
-### Running om on a host
+### Running om
 
 ```shell
 $ om 192.168.0.1
 ```
 
-### Running om on multiple hosts
+### Running om on Multiple Hosts
 
 ```shell
 $ om 192.168.0.2,box2
 ```
 
-### SSH username, password and port
+### Custom SSH user, password and port
 
 ```shell
 $ om root:mypass@mybox:44445
 ```
 
-### Running om using a [configuration file](#configuration-file)
+### Using a [Configuration File](#configuration-file)
 
 ```shell
 $ om -c <config.json>
@@ -65,25 +66,58 @@ $ om -c <config.json>
 
 ## Configuration File
 
-### Specifying Machines
+The configuration file can be used for more advanced setups. Some use cases are monitoring multiple hosts, specifying
+alarming values of disk, cpu or memory usage for a host or for all hosts, using custom handlers, monitoring process
+status (running/stopped) and etc.
 
-The config file is a JSON and informs which machines are to be monitored.
+Please note that though the config file allows much customisation and host-specific settings, we suggest you to avoid
+most of them. Our goal with om is to have the best defaults so you don't have to configure much.
+
+### Quick Reference
+
+The configuration file must have a ''hosts'' section to indicate which hosts you want to collect from. It can also
+include ''ssh'' and ''plugins'' sections for global configuration of SSH (username, password, port) and [plugins](#plugins).
+
+Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 
 ```json
 {
-  "machines": {
-    "my_rails_app": {
-      "host": "125.22.13.12",
+  "hosts": {
+    # Hosts go here
+    # (required)
+
+    "host1": {
+
+      # IP or hostname goes here
+      "host": "179.25.15.2",
+
       "ssh": {
-        "username": "foo",
-        "password": "bar"
+        # Host-specific SSH settings go here
+        # (optional)
+      }
+
+      "plugins": {
+        # Host specific plugin configurations go here
+        # (optional)
       }
     }
+  },
+
+  "ssh": {
+    # Global SSH settings go here
+    # (optional)
+  },
+
+  "plugins": {
+    # Global plugin configurations go here
+    # (optional)
   }
 }
 ```
 
-The only required field is ''host''. ''ssh'' is entirely optional if your local agent is already able to use keys to get to the machine.
+Remember that having your SSH keys in place for the current user allows you to skip configuring ''ssh''. om can already load them from the local agent
+
+''ssh'' is entirely optional if your local agent is already able to use keys to get to the machine.
 
 ### Plugins
 
@@ -98,7 +132,7 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
 
 ```json
 {
-  "machines": {
+  "hosts": {
     "my_rails_app": {
       "host": "125.22.13.12",
       "plugins": {
@@ -117,7 +151,7 @@ You can also override the default value globally:
 
 ```json
 {
-  "machines": {
+  "hosts": {
     "my_rails_app": {
       "host": "125.22.13.12",
     },

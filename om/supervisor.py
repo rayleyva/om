@@ -9,7 +9,7 @@ log = get_logger("supervisor")
 
 
 class Supervisor(object):
-    '''Schedules the remote metrics calls for monitored machines. Delegates handling of
+    '''Schedules the remote metrics calls for monitored hosts. Delegates handling of
     results.
     '''
     POLL_FREQUENCY_MINUTES = 1
@@ -22,7 +22,7 @@ class Supervisor(object):
     def run(self):
         self.running = True
         while self.running:
-            map(self.collect_metrics, self.config.machines)
+            map(self.collect_metrics, self.config.hosts)
             time.sleep(self.poll_frequency * 60)
 
     def collect_metrics(self, machine):

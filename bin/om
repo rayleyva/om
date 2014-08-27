@@ -71,12 +71,12 @@ def parse_machine(machine):
 
     return config
 
-def parse_machines():
-    machines = {}
+def parse_hosts():
+    hosts = {}
     for machine in sys.argv[1].split(','):
         config = parse_machine(machine)
-        machines[config['host']] = config
-    return machines
+        hosts[config['host']] = config
+    return hosts
 
 def usage():
     print __help__
@@ -120,7 +120,7 @@ if __name__ == '__main__':
             else:
                 handlers['stdout'] = {}
 
-            config = temp_config({'machines': parse_machines(), 'handlers': handlers})
+            config = temp_config({'hosts': parse_hosts(), 'handlers': handlers})
             supervisor = Supervisor(config.name)
 
     if supervisor:
