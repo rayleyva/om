@@ -17,6 +17,10 @@
   - [Quick Reference](#quick-reference)
   - [Monitoring a Process](#processes)
   - [Plugins](#plugins)
+    - [CPU, Memory and Disk Usage][#cpu-memory-and-disk-usage]
+    - [Check if a Process is Running][#check-if-a-process-is-running]
+    - [Check if Disk Usage is Over 50%][#check-if-disk-usage-is-over-50]
+    - [Check if Disk Usage is Over 50% for All Hosts][#check-if-disk-usage-is-over-50-for-all-hosts]
 - [Contributing to om](#contributing-to-om)
 - [Hacking on om](#hacking-on-om)
 - [License](#license)
@@ -115,12 +119,39 @@ Remember that having your SSH keys in place for the current user allows you to s
 
 ### Plugins
 
-The "plugins" section allows you to further customize your monitoring. Our current plugins are:
+List available plugins:
 
-- disk_usage
-- memory_usage
-- cpu_load
-- process_state
+```shell
+$ om -p
+```
+
+#### CPU, Memory and Disk Usage
+
+CPU load, memory and disk usage have builtin plugins and are always collected by om. No further configuration is required.
+
+#### Check if a Process is Running
+
+Checking if a process ''nginx'' is running:
+
+```ruby
+{
+  "hosts": {
+    "my_web_server": {
+      "host": "192.168.0.1",
+
+      "plugins": {
+        "process_state": {
+          "process_name": "nginx"
+        }
+      }
+    }
+  }
+
+  ...
+}
+```
+
+#### Check if Disk Usage is Over 50%
 
 For instance, disk usages are reported as critical when they reach 80% usage. If for a certain box you want to be critical when it reaches 50%, then:
 
@@ -129,6 +160,7 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
   "hosts": {
     "my_rails_app": {
       "host": "125.22.13.12",
+
       "plugins": {
         "disk_usage": {
           "thresholds": {
@@ -138,17 +170,18 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
       }
     }
   }
+
+  ...
 }
 ```
+
+#### Check if Disk Usage is Over 50% for All Hosts
 
 You can also override the default value globally:
 
 ```json
 {
   "hosts": {
-    "my_rails_app": {
-      "host": "125.22.13.12",
-    },
     "my_postgres": {
       "host": "postgresbox",
       "disk_usage": {
@@ -158,6 +191,7 @@ You can also override the default value globally:
       }
     }
   },
+
   "plugins": {
     "disk_usage": {
       "thresholds": {
@@ -167,6 +201,8 @@ You can also override the default value globally:
   }
 }
 ```
+
+### Monitoring processes
 
 ## Contributing to om
 
