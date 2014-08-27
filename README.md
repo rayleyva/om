@@ -17,10 +17,10 @@
   - [Quick Reference](#quick-reference)
   - [Monitoring a Process](#processes)
   - [Plugins](#plugins)
-    - [CPU, Memory and Disk Usage][#cpu-memory-and-disk-usage]
-    - [Check if a Process is Running][#check-if-a-process-is-running]
-    - [Check if Disk Usage is Over 50%][#check-if-disk-usage-is-over-50]
-    - [Check if Disk Usage is Over 50% for All Hosts][#check-if-disk-usage-is-over-50-for-all-hosts]
+    - [CPU, Memory and Disk Usage](#cpu-memory-and-disk-usage)
+    - [Check if a Process is Running](#check-if-a-process-is-running)
+    - [Check if Disk Usage is Over 50%](#check-if-disk-usage-is-over-50)
+    - [Check if Disk Usage is Over 50% for All Hosts](#check-if-disk-usage-is-over-50-for-all-hosts)
 - [Contributing to om](#contributing-to-om)
 - [Hacking on om](#hacking-on-om)
 - [License](#license)
