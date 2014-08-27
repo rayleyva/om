@@ -2,7 +2,7 @@
 
 import json
 
-from om.handler import StdoutHandler, MailHandler
+from om.handler import JSONStdoutHandler, StdoutHandler, MailHandler
 from om.machine import Machine
 from om.utils.logger import get_logger
 
@@ -31,12 +31,16 @@ class Config(object):
     @property
     def handlers(self):
         if not self._handlers:
-            self._handlers = [StdoutHandler()]
+            self._handlers = []
             for handler, config in self.get('handlers', {}).iteritems():
                 if handler == 'email':
-                    self.handlers.append(MailHandler(**config))
+                    self._handlers.append(MailHandler(**config))
+                elif handler == 'stdout':
+                    self._handlers.append(StdoutHandler(**config))
+                elif handler == 'json_stdout':
+                    self._handlers.append(JSONStdoutHandler(**config))
 
-            log.debug('loaded handlers %s' % self.handlers)
+            log.debug('loaded handlers %s' % self._handlers)
 
         return self._handlers
 

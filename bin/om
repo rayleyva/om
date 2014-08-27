@@ -5,43 +5,125 @@ import sys
 
 from om.supervisor import Supervisor
 
+__help__ = '''Usage:
+
+    Collect for a single host:
+
+        $ om host
+
+    Collect for multiple hosts:
+
+        $ om host1,host2,host3
+
+    Custom user, password and port:
+
+        $ om user:password@host:port
+
+    JSON output on stdout:
+
+        $ om host -j
+
+    Config file: allows using handlers, plugins and thresholds for metrics
+
+        $ om -c <config.json>
+
+        config file format: https://github.com/overseer-monitoring/om#configuration-file
+
+    Listing plugins:
+
+        $ om -p
+
+    Listing handlers:
+
+        $ om -l
+
+    Prints this help:
+
+        $ om -h
+
+    Version:
+
+        $ om -v
+'''
+
+def temp_config(data):
+    import tempfile, json
+    config = tempfile.NamedTemporaryFile()
+    config.write(json.dumps(data))
+    config.seek(0)
+    return config
+
+def parse_machine(machine):
+    config = {'ssh': {}}
+
+    if '@' in machine:
+        userpart, machine = machine.split('@')
+        if ':' in userpart:
+            config['ssh']['username'], config['ssh']['password'] = userpart.split(':')
+        else:
+            config['username'] = userpart
+
+    if ':' in machine:
+        config['host'], config['ssh']['port'] = machine.split(':')
+        config['ssh']['port'] = int(config['ssh']['port'])
+    else:
+        config['host'] = machine
+
+    return config
+
+def parse_machines():
+    machines = {}
+    for machine in sys.argv[1].split(','):
+        config = parse_machine(machine)
+        machines[config['host']] = config
+    return machines
+
+def usage():
+    print __help__
+
+def version():
+    import om
+    print om.__version__
+
+def list_plugins():
+    from om.plugin import list_plugins, list_default_plugins
+    print 'Available plugins:'
+    for plugin in list_plugins():
+        print "\t%s" % plugin.name
+    print '\nDefault plugins: %s' % [p.name for p in list_default_plugins()]
+
+def list_handlers():
+    print 'TODO'
+
 if __name__ == '__main__':
     supervisor = None
 
-    if len(sys.argv) == 2:
-        import tempfile, json
+    if len(sys.argv) == 2 and sys.argv[1].startswith('-'):
+        {'-h': usage,
+         '-v': version,
+         '-p': list_plugins,
+         '-l': list_handlers}.get(sys.argv[1], usage)()
+        sys.exit(0)
 
-        machines = {}
-        for machine in sys.argv[1].split(','):
-            config = {'ssh': {}}
+    if len(sys.argv) >= 2:
+        if len(sys.argv) == 3 and sys.argv[1] == '-c':
+            config_file = sys.argv[2]
+            supervisor = Supervisor(config_file)
+        else:
+            handlers = {}
 
-            if '@' in machine:
-                userpart, machine = machine.split('@')
-                if ':' in userpart:
-                    config['ssh']['username'], config['ssh']['password'] = userpart.split(':')
-                else:
-                    config['username'] = userpart
-
-            if ':' in machine:
-              config['host'], config['ssh']['port'] = machine.split(':')
-              config['ssh']['port'] = int(config['ssh']['port'])
+            if '-j' in sys.argv:
+                handlers['json_stdout'] = {}
             else:
-              config['host'] = machine
+                handlers['stdout'] = {}
 
-            machines[config['host']] = config
-
-        config = tempfile.NamedTemporaryFile()
-        config.write(json.dumps({'machines': machines}))
-        config.seek(0)
-        supervisor = Supervisor(config.name)
-    elif len(sys.argv) == 3:
-        if sys.argv[1] == '-c':
-            supervisor = Supervisor(sys.argv[2])
+            config = temp_config({'machines': parse_machines(), 'handlers': handlers})
+            supervisor = Supervisor(config.name)
 
     if supervisor:
         supervisor.run()
     else:
-        print 'Usage:'
+        print 'help:'
         print '\tom <host>'
         print '\tom -c <config.json>'
         sys.exit(0)

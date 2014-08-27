@@ -45,17 +45,27 @@ class Handler(object):
 
 
 class StdoutHandler(Handler):
-    '''Outputs all metrics to stdout
+    '''Outputs all metrics to stdout.
     '''
 
     def handles(self, metric):
         return True
 
     def handle(self, metric):
-        if metric.state == 'critical':
-            log.error("%s:%s:%s %s" % (metric.host, metric.plugin.name, metric.state, metric.values))
-        else:
-            log.debug("%s:%s:%s %s" % (metric.host, metric.plugin.name, metric.state, metric.values))
+        print "%s:%s:%s %s" % (metric.host, metric.plugin.name, metric.state, metric.values)
+
+
+import json
+
+class JSONStdoutHandler(Handler):
+    '''Outputs metrics in JSON format to stdout
+    '''
+
+    def handles(self, metric):
+        return True
+
+    def handle(self, metric):
+        print json.dumps(metric.values)
 
 
 class MailHandler(Handler):

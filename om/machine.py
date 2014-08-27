@@ -34,4 +34,3 @@ class Machine(object):
             plugins = [p for p in list_plugins() if p.name in pnames]
         load = lambda plugin: plugin(**configs.get(plugin.name, {}))
         return map(load, plugins)
-
