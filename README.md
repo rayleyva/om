@@ -21,6 +21,7 @@
     - [Check if a Process is Running](#check-if-a-process-is-running)
     - [Check if Disk Usage is Over 50%](#check-if-disk-usage-is-over-50)
     - [Check if Disk Usage is Over 50% for All Hosts](#check-if-disk-usage-is-over-50-for-all-hosts)
+  - [Handlers](#handlers)
 - [Contributing to om](#contributing-to-om)
 - [Hacking on om](#hacking-on-om)
 - [License](#license)
@@ -80,7 +81,8 @@ most of them. Our goal with om is to have the best defaults so you don't have to
 ### Quick Reference
 
 The configuration file must have a ''hosts'' section to indicate which hosts you want to collect from. It can also
-include ''ssh'' and ''plugins'' sections for global configuration of SSH (username, password, port) and [plugins](#plugins).
+include ''ssh'', ''plugins'' and ''handlers'' sections for global configuration of SSH (username, password, port), [plugins](#plugins) and
+[handlers](#handlers).
 
 Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 
@@ -109,6 +111,10 @@ Hosts allow host-specific settings for SSH and plugins for more advanced setups.
 
   "plugins": {
     # Global plugin configurations go here (optional)
+  }
+
+  "handlers": {
+    # Handlers configurations go here
   }
 }
 ```
@@ -207,6 +213,13 @@ You can also override the default value globally:
   }
 }
 ```
+
+### Handlers
+
+Handlers receive the results of the plugins metrics and act upon them. Handlers can be as simple as the StdOut handler that simply prints the
+results to stdout or can save the metrics to a database. Plugins can be configured to have thresholds that are used to detect if the measured value
+indicates a risky situation. Handlers have access to this information and it can act only if the value is critical. For example, an Email handler
+can be configured to mail sysadmins only if the value reaches a critical or bad value.
 
 ## Contributing to om
 
