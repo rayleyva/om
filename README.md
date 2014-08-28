@@ -146,14 +146,15 @@ Checking if a process ''nginx'' is running:
       "host": "192.168.0.1",
 
       "plugins": {
-        "process_state": {
-          "proxy": {
-            "process": "nginx"
-          },
-
-          "rails_web_worker": {
-            "process": "unicorn"
-          }
+        "process_state":
+          [
+            {
+              "process": "nginx"
+            },
+            {
+              "process": "unicorn"
+            }
+          ]
         }
       }
     }
@@ -174,11 +175,13 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
       "host": "125.22.13.12",
 
       "plugins": {
-        "disk_usage": {
-          "thresholds": {
-            "usage": "50%"
+        "disk_usage": [
+          {
+            "thresholds": {
+              "usage": "50%"
+            }
           }
-        }
+        ]
       }
     }
   }
@@ -205,11 +208,13 @@ You can also override the default value globally:
   },
 
   "plugins": {
-    "disk_usage": {
-      "thresholds": {
-        "usage": "50%"
+    "disk_usage": [
+      {
+        "thresholds": {
+          "usage": "50%"
+        }
       }
-    }
+    ]
   }
 }
 ```
