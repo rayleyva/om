@@ -123,6 +123,43 @@ Remember that having your SSH keys in place for the current user allows you to s
 
 ''ssh'' is entirely optional if your local agent is already able to use keys to get to the machine.
 
+### Config file example
+
+```ruby
+{
+  "ssh": {
+    "username": "user001"
+  },
+  "hosts": {
+    "webserver01": {
+      "host": "webserver01.overseer.om",
+      "plugins": {
+        "process_state": [
+          {
+            "process_name": "nginx"
+          }
+          {
+            "process_name": "postgres"
+          }
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "disk_usage": [
+      {
+        "thresholds": {
+          "usage": 90
+        }
+      }
+    ]
+  },
+  "handlers": {
+    "stdout" : {},
+  }
+}
+```
+
 ### Plugins
 
 List available plugins:
