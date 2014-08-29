@@ -4,6 +4,9 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 
+import sqlite3
+import redis
+
 from om.utils.logger import get_logger
 
 log = get_logger("metrics")
@@ -99,6 +102,52 @@ class MailHandler(Handler):
 
         server.sendmail(fromaddr, toaddr, msg.as_string())
 
-HANDLERS = [MailHandler, JSONStdoutHandler, StdoutHandler]
+class Sqlite3Handler(Handler):
+    '''Stores the metrics in a sqlite3 database
+    '''
+
+    def __init__(self, **kwargs):
+        super(Sqlite3Handler,self).__init__()
+        self.path = kwargs['path']
+
+    def handles(self, metric):
+        return True
+
+    def handle(self, metric):
+        conn = sqlite3.connect(self.path)
+        c = conn.cursor()
+        host_plugin = u'%s:%s' % (metric.host, metric.plugin.name)
+        for instance,datadict in metric.values.iteritems():
+            host_plugin_instance = u'%s:%s' % (host_plugin, instance)
+            for k,v in datadict.iteritems():
+                #WIP finish me
+                c.execute("INSERT INTO %s VALUES ('%s', '%s', %s)" % (self._get_table_name(metric.plugin), metric.host, metric.timestamp, self._gen_values(v))
+
+        conn.commit()
+        conn.close()
+
+
+class RedisHandler(Handler):
+    '''Stores the metrics in a Redis database
+    '''
+
+    def __init__(self, **kwargs):
+        super(RedisHandler,self).__init__()
+        host = kwargs.get('host', 'localhost')
+        port = kwargs.get('port', 6379)
+        self.redis = redis.StrictRedis(host=host, port=port, db=0)
+
+    def handles(self, metric):
+        return True
+
+    def handle(self, metric):
+        pipeline = self.redis.pipeline()
+        host_plugin = u'%s:%s' % (metric.host, metric.plugin.name)
+        for instance,datadict in metric.values.iteritems():
+            host_plugin_instance = u'%s:%s' % (host_plugin, instance)
+            for k,v in datadict.iteritems():
+                pipeline.lpush(u'%s:%s' % (host_plugin_instance, k), v)
+
+HANDLERS = [MailHandler, JSONStdoutHandler, StdoutHandler, Sqlite3Handler, RedisHandler]
 def list_handlers():
     return HANDLERS

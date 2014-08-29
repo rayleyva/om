@@ -2,7 +2,7 @@
 
 import json
 
-from om.handler import JSONStdoutHandler, StdoutHandler, MailHandler
+from om.handler import JSONStdoutHandler, StdoutHandler, MailHandler, RedisHandler, Sqlite3Handler
 from om.machine import Machine
 from om.utils.logger import get_logger
 
@@ -39,6 +39,10 @@ class Config(object):
                     self._handlers.append(StdoutHandler(**config))
                 elif handler == 'json_stdout':
                     self._handlers.append(JSONStdoutHandler(**config))
+                elif handler == 'redis':
+                    self._handlers.append(RedisHandler(**config))
+                elif handler == 'sqlite3':
+                    self._handlers.append(Sqlite3Handler(**config))
 
             log.debug('loaded handlers %s' % self._handlers)
 
