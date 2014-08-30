@@ -32,7 +32,6 @@ class Config(object):
     def handlers(self):
         if not self._handlers:
             for handler, config in self.get('handlers', {}).iteritems():
-                print self._config
                 if handler == 'email':
                     self._handlers.append(MailHandler(**config))
                 elif handler == 'stdout':
@@ -43,7 +42,6 @@ class Config(object):
                     self._handlers.append(RedisHandler(**config))
                 elif handler == 'sqlite3':
                     self._handlers.append(Sqlite3Handler(**config))
-
             log.debug('loaded handlers %s' % self._handlers)
 
         return self._handlers
@@ -59,7 +57,7 @@ class Config(object):
                 machine_ssh = config.get('ssh', global_ssh)
                 machine_metrics = global_metrics.copy()
                 machine_metrics.update(config.get('plugins', {}))
-
                 self._hosts.append(Machine(machine_host, machine_ssh, machine_metrics))
+            log.debug('loaded hosts %s' % self._hosts)
 
         return self._hosts
