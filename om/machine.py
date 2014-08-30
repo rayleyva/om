@@ -21,8 +21,7 @@ class Machine(object):
         return res
 
     def __repr__(self):
-        return "<Machine executor='%s' plugins=%s>" % \
-               (self.executor, self.plugins)
+        return "<Machine host='%s'>" % self.host
 
     @staticmethod
     def load_plugins(configs):
@@ -34,6 +33,7 @@ class Machine(object):
         load = lambda plugin: plugin(**configs.get(plugin.name, {}))
         instances = []
         for p_klass in plugins:
-            for c in configs.get(p_klass.name, {}):
+            for name, c in configs.get(p_klass.name, {'default': {}}).iteritems():
                 instances.append(p_klass(**c))
+
         return instances
