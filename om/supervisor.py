@@ -26,6 +26,7 @@ class Supervisor(object):
             time.sleep(self.poll_frequency * 60)
 
     def collect_metrics(self, machine):
+        log.debug("collecting for %s" % machine.host)
         self.handle_results(machine.run_plugins())
 
     def handle_results(self, results=[]):
