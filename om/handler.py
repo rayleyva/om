@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import time
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
@@ -120,8 +121,9 @@ class Sqlite3Handler(Handler):
         for instance,datadict in metric.values.iteritems():
             host_plugin_instance = u'%s:%s' % (host_plugin, instance)
             for k,v in datadict.iteritems():
+                print "%s=%s" % (k, v)
                 #WIP finish me
-                c.execute("INSERT INTO %s VALUES ('%s', '%s', %s)" % (self._get_table_name(metric.plugin), metric.host, metric.timestamp, self._gen_values(v))
+                # c.execute("INSERT INTO %s VALUES ('%s', '%s', %s)" % (self._get_table_name(metric.plugin), metric.host, metric.timestamp, self._gen_values(v))
 
         conn.commit()
         conn.close()
@@ -132,7 +134,7 @@ class RedisHandler(Handler):
     '''
 
     def __init__(self, **kwargs):
-        super(RedisHandler,self).__init__()
+        super(RedisHandler, self).__init__()
         host = kwargs.get('host', 'localhost')
         port = kwargs.get('port', 6379)
         self.redis = redis.StrictRedis(host=host, port=port, db=0)
@@ -146,7 +148,8 @@ class RedisHandler(Handler):
         for instance,datadict in metric.values.iteritems():
             host_plugin_instance = u'%s:%s' % (host_plugin, instance)
             for k,v in datadict.iteritems():
-                pipeline.lpush(u'%s:%s' % (host_plugin_instance, k), v)
+                pipeline.lpush(u'%s:%s' % (host_plugin_instance, k), "[%d,%s]" % (time.time(), v))
+        pipeline.execute()
 
 HANDLERS = [MailHandler, JSONStdoutHandler, StdoutHandler, Sqlite3Handler, RedisHandler]
 def list_handlers():
