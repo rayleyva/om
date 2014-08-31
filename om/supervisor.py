@@ -12,7 +12,7 @@ class Supervisor(object):
     '''Schedules the remote metrics calls for monitored hosts. Delegates handling of
     results.
     '''
-    POLL_FREQUENCY_MINUTES = 1
+    POLL_FREQUENCY_MINUTES = 5
 
     def __init__(self, config_file=None):
         self.running = False
