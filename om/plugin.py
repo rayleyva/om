@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from om.thresholds import NumericThresholdCreatorMixin, EnumThresholdCreatorMixin
 from om.metric import Metric
 
@@ -44,7 +46,7 @@ class ShellPlugin(Plugin):
         for processor in [self._status_check, self._output_parse]:
             output = processor(output, status)
 
-        return Metric(executor.host, self, output, self.thresholds)
+        return Metric(executor.host, self, datetime.now(), output, self.thresholds)
 
 
 class DiskUsage(ShellPlugin, NumericThresholdCreatorMixin):

@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 class Metric(object):
 
-    def __init__(self, host, plugin, values={}, thresholds={}):
+    def __init__(self, host, plugin, timestamp=datetime.now(), values={}, thresholds={}):
         self.host = host
         self.plugin = plugin
+        self.timestamp = timestamp
         self.values = values
         self.thresholds = thresholds
 
