@@ -123,16 +123,40 @@ class Sqlite3Handler(Handler):
     def handles(self, metric):
         return True
 
+    def _get_table_name(self, plugin):
+        return 'om_%s' % plugin.name
+
+    def _type_for_description(self, desc):
+        if desc == 'int': return 'INTEGER'
+        if desc.startswith('string'):
+            return desc.replace('string', 'VARCHAR')
+
+        return ''
+
+    def _gen_values(self, datadict):
+        return ','.join([u"'%s'" % unicode(datadict[k]) for k in sorted(datadict.keys())])
+
+    def setup_for_plugin(self, p):
+        table_name = self._get_table_name (p)
+        columns = ['host TEXT NOT NULL', 'timestamp DATETIME NOT NULL', 'instance TEXT']
+        for name in sorted(p.metric_descriptions.keys()):
+            description = p.metric_descriptions[name]
+            columns.append(u'%s %s' % (name, self._type_for_description(description)))
+        columns = ','.join(columns)
+
+        conn = sqlite3.connect(self.path)
+        c = conn.cursor()
+        c.execute(u'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, columns))
+        conn.commit()
+        conn.close()
+
     def handle(self, metric):
         conn = sqlite3.connect(self.path)
         c = conn.cursor()
-        host_plugin = u'%s:%s' % (metric.host, metric.plugin.name)
         for instance,datadict in metric.values.iteritems():
-            host_plugin_instance = u'%s:%s' % (host_plugin, instance)
-            for k,v in datadict.iteritems():
-                print "%s=%s" % (k, v)
-                #WIP finish me
-                # c.execute("INSERT INTO %s VALUES ('%s', '%s', %s)" % (self._get_table_name(metric.plugin), metric.host, metric.timestamp, self._gen_values(v))
+            c.execute("INSERT INTO %s VALUES ('%s', '%s', '%s', %s)" % (self._get_table_name(metric.plugin),
+                                                                        metric.host, metric.timestamp, instance,
+                                                                        self._gen_values(datadict)))
 
         conn.commit()
         conn.close()
