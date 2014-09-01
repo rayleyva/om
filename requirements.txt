@@ -2,3 +2,4 @@ paramiko==1.14.0
 setuptools==5.7
 redis
 wheel
+pytest

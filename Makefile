@@ -7,7 +7,7 @@ clean:
 	rm -rf dist/
 
 test:
-	echo "TBD"
+	py.test test_om.py
 
 publish:
 	python setup.py register
