@@ -10,6 +10,7 @@ class Plugin(object):
     '''
     PLUGIN_STATES = ['normal', 'critical']
     name = ''
+    metric_descriptions = {}
 
     def __init__(self, *args, **kwargs):
         super(Plugin,self).__init__() #swallow arguments
@@ -54,6 +55,7 @@ class DiskUsage(ShellPlugin, NumericThresholdCreatorMixin):
     '''
     name = 'disk_usage'
     default_thresholds = {'usage': 80}
+    metric_descriptions = {'usage': 'int'}
 
     @property
     def command(self):
@@ -78,6 +80,7 @@ class MemoryUsage(ShellPlugin, NumericThresholdCreatorMixin):
     '''
     name = 'memory_usage'
     default_thresholds = {'usage': 70}
+    metric_descriptions = {'usage': 'int'}
 
     @property
     def command(self):
@@ -96,6 +99,7 @@ class CPULoad(ShellPlugin, NumericThresholdCreatorMixin):
     '''
     name = 'cpu_load'
     default_thresholds = {'avg_1min': 25, 'avg_5min': 50, 'avg_15min': 75}
+    metric_descriptions = {'avg_1min': 'int', 'avg_5min' : 'int', 'avg_15min' : 'int'}
 
     @property
     def command(self):
@@ -111,6 +115,7 @@ class ProcessState(ShellPlugin, EnumThresholdCreatorMixin):
     name = 'process_state'
     default_thresholds = {'status' : {'good' : ['running'],
                                       'bad' : ['not-running']}}
+    metric_descriptions = {'status': 'string(12)'}
 
     def __init__(self, **kwargs):
         super(ProcessState, self).__init__(**kwargs)
