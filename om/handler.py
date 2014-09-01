@@ -44,6 +44,15 @@ class Handler(object):
     def handle(self, metric):
         raise NotImplementedError
 
+    def setup(self):
+        pass
+
+    def teardown(self):
+        pass
+
+    def setup_for_plugin(self, p):
+        pass
+
     def __repr__(self):
         return "<Handler:%s>" % type(self).__name__
 

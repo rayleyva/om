@@ -22,8 +22,28 @@ class Supervisor(object):
     def run(self):
         self.running = True
         while self.running:
+            self.init_handlers()
             map(self.collect_metrics, self.config.hosts)
+            self.finalize_handlers()
+
             time.sleep(self.poll_frequency * 60)
+
+    def init_handlers(self):
+        plugins = set([])
+        for machine in self.config.hosts:
+            for p in machine.plugins:
+                plugins.add(p)
+
+        for h in self.config.handlers:
+            h.setup()
+            for p in plugins:
+                h.setup_for_plugin(p)
+
+
+
+    def finalize_handlers(self):
+        for h in self.config.handlers:
+            h.teardown()
 
     def collect_metrics(self, machine):
         log.debug("collecting for %s" % machine.host)
