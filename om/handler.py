@@ -178,7 +178,7 @@ class RedisHandler(Handler):
     def handle(self, metric):
         pipeline = self.redis.pipeline()
         host_plugin = u'%s:%s' % (metric.host, metric.plugin.name)
-        for instance,datadict in metric.values.iteritems():
+        for instance, datadict in metric.values.iteritems():
             host_plugin_instance = u'%s:%s' % (host_plugin, instance)
             for k,v in datadict.iteritems():
                 pipeline.lpush(u'%s:%s' % (host_plugin_instance, k), "[%d,%s]" % (time.time(), v))
