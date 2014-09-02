@@ -3,6 +3,7 @@ import time
 
 from om.config import Config
 from om.handler import Handler
+from om.plugin import list_native_plugins
 from om.utils.logger import get_logger
 
 log = get_logger("supervisor")
@@ -29,7 +30,7 @@ class Supervisor(object):
             time.sleep(self.poll_frequency * 60)
 
     def init_handlers(self):
-        plugins = set([])
+        plugins = set(list_native_plugins())
         for machine in self.config.hosts:
             for p in machine.plugins:
                 plugins.add(p)

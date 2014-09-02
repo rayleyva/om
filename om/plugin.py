@@ -21,6 +21,15 @@ class Plugin(object):
     def __repr__(self):
         return "<Plugin name='%s'>" % (self.name)
 
+class NativeReachablePlugin(Plugin, EnumThresholdCreatorMixin):
+    name = 'native_reachable'
+    metric_descriptions = {'reachable': 'string(32)'}
+    default_thresholds = {'reachable': {'good': ['online'],
+                                        'bad': ['unreachable', 'autherror']}}
+
+    def __init__(self, **kwargs):
+        super(NativeReachablePlugin, self).__init__(**kwargs)
+        self.create_thresholds(kwargs.get('thresholds', self.default_thresholds))
 
 class ShellPlugin(Plugin):
     default_thresholds = {}
@@ -147,3 +156,7 @@ def list_plugins():
 DEFAULT_PLUGINS = [CPULoad, DiskUsage, MemoryUsage]
 def list_default_plugins():
     return DEFAULT_PLUGINS
+
+NATIVE_PLUGINS_LIST = [NativeReachablePlugin]
+def list_native_plugins():
+    return NATIVE_PLUGINS_LIST
