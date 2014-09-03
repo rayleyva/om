@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import os, errno
 import json
+import getpass
 
 from om.handler import JSONStdoutHandler, StdoutHandler, MailHandler, RedisHandler, Sqlite3Handler
 from om.machine import Machine
@@ -8,6 +10,14 @@ from om.utils.logger import get_logger
 
 log = get_logger("config")
 
+
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except os.error, e:
+        if e.errno != errno.EEXIST:
+            raise
 
 class Config(object):
 
@@ -24,9 +34,23 @@ class Config(object):
         return self._config.get(key, default_val)
 
     def _load_config(self, path):
-        if path is not None:
+        if path is not None and os.path.exists(path):
             with open(path) as config_file:
                 self._config = json.load(config_file)
+        else:
+            self._bootstrap_config(path)
+
+    def _bootstrap_config(self, path):
+        log.info("Creating %s" % path)
+        self._config = {'hosts': {}, 'handlers': {'stdout': {}}}
+
+        try:
+            mkdir_p('/etc/om')
+            with open(path, 'w') as config_file:
+                json.dump(self._config, config_file)
+        except OSError as ose:
+            log.error('Insufficient permissions at /etc/om. Please "sudo mkdir /etc/om" and "sudo chown %s /etc/om"' % getpass.getuser())
+            raise ose
 
     @property
     def handlers(self):

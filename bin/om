@@ -6,12 +6,7 @@ import sys
 from om.supervisor import Supervisor
 
 __help__ = '''Usage:
-
-    Collect for a single host:
-
-        $ om host
-
-    Collect for multiple hosts:
+    Collect data for hosts:
 
         $ om host1,host2,host3
 
@@ -22,16 +17,6 @@ __help__ = '''Usage:
     JSON output on stdout:
 
         $ om host -j
-
-    Config file: allows using handlers, plugins and thresholds for metrics
-
-        $ om -c <config.json>
-
-        config file format: https://github.com/overseer-monitoring/om#configuration-file
-
-    Listing plugins:
-
-        $ om -p
 
     Listing handlers:
 
@@ -45,6 +30,13 @@ __help__ = '''Usage:
 
         $ om -v
 '''
+
+def usage():
+    print __help__
+
+def version():
+    import om
+    print om.__version__
 
 def temp_config(data):
     import tempfile, json
@@ -78,13 +70,6 @@ def parse_hosts():
         hosts[config['host']] = config
     return hosts
 
-def usage():
-    print __help__
-
-def version():
-    import om
-    print om.__version__
-
 def list_plugins():
     from om.plugin import list_plugins, list_default_plugins
     print 'Available plugins:'
@@ -98,15 +83,16 @@ def list_handlers():
     for handler in list_handlers():
         print "\t%s" % handler.__name__
 
+
 if __name__ == '__main__':
     supervisor = None
 
     if len(sys.argv) == 2 and sys.argv[1].startswith('-'):
         {'-h': usage,
          '-v': version,
-         '-p': list_plugins,
          '-l': list_handlers}.get(sys.argv[1], usage)()
         sys.exit(0)
+
 
     if len(sys.argv) >= 2:
         if len(sys.argv) == 3 and sys.argv[1] == '-c':
@@ -125,8 +111,3 @@ if __name__ == '__main__':
 
     if supervisor:
         supervisor.run()
-    else:
-        print 'help:'
-        print '\tom <host>'
-        print '\tom -c <config.json>'
-        sys.exit(0)

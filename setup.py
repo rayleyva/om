@@ -15,8 +15,8 @@ if sys.argv[-1] == 'publish':
     sys.exit()
 
 packages = ['om', 'om.utils']
-requires = ['paramiko']
-scripts = ['bin/om']
+requires = ['paramiko', 'watchdog']
+scripts = ['bin/om', 'bin/omd']
 
 with open('README.md') as f:
     readme = f.read()
