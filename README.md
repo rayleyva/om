@@ -133,27 +133,26 @@ Remember that having your SSH keys in place for the current user allows you to s
   "hosts": {
     "webserver01": {
       "host": "webserver01.overseer.om",
-      "plugins": {
-        "process_state": [
-          {
-            "process_name": "nginx"
-          }
-          {
-            "process_name": "postgres"
-          }
-        ]
-      }
+      "plugins": [
+        {
+          "type": "process_state",
+          "process_name": "nginx"
+        },
+        {
+          "type": "process_state",
+          "process_name": "postgres"
+        }
+      ]
     }
   },
-  "plugins": {
-    "disk_usage": [
-      {
-        "thresholds": {
-          "usage": 90
-        }
+  "plugins": [
+    {
+      "type": "disk_usage",
+      "thresholds": {
+        "usage": 90
       }
-    ]
-  },
+    }
+  ],
   "handlers": {
     "stdout" : {},
   }
@@ -182,18 +181,16 @@ Checking if a process ''nginx'' is running:
     "my_web_server": {
       "host": "192.168.0.1",
 
-      "plugins": {
-        "process_state":
-          [
-            {
-              "process": "nginx"
-            },
-            {
-              "process": "unicorn"
-            }
-          ]
+      "plugins": [
+        {
+          "type": "process_state",
+          "process_name" : "nginx"
+        },
+        {
+          "type": "process_state",
+          "process_name" : "unicorn"
         }
-      }
+      ]
     }
   }
 
@@ -211,15 +208,14 @@ For instance, disk usages are reported as critical when they reach 80% usage. If
     "my_rails_app": {
       "host": "125.22.13.12",
 
-      "plugins": {
-        "disk_usage": [
-          {
-            "thresholds": {
-              "usage": "50%"
-            }
+      "plugins": [
+        {
+          "type": "disk_usage",
+          "thresholds": {
+            "usage": "50%"
           }
-        ]
-      }
+        }
+      ]
     }
   }
 
@@ -236,23 +232,24 @@ You can also override the default value globally:
   "hosts": {
     "my_postgres": {
       "host": "postgresbox",
-      "disk_usage": {
-        "thresholds": {
-          "usage": "60%"
+      "plugins_config": {
+        "disk_usage": {
+          "thresholds": {
+            "usage": "60%"
+          }
         }
       }
     }
   },
 
-  "plugins": {
-    "disk_usage": [
-      {
-        "thresholds": {
-          "usage": "50%"
-        }
+  "plugins": [
+    {
+      "type": "disk_usage",
+      "thresholds": {
+        "usage": "50%"
       }
-    ]
-  }
+    }
+  ]
 }
 ```
 
