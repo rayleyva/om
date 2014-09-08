@@ -160,3 +160,9 @@ def list_default_plugins():
 NATIVE_PLUGINS_LIST = [NativeReachablePlugin]
 def list_native_plugins():
     return NATIVE_PLUGINS_LIST
+
+def create_plugin(config):
+    #TODO not optimal
+    for p in list_plugins():
+        if p.name == config['type']:
+            return p(**config)

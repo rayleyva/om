@@ -73,14 +73,14 @@ class Config(object):
     @property
     def hosts(self):
         if not self._hosts:
-            global_metrics = self.get('plugins', {})
+            global_metrics = self.get('plugins', [])
             global_ssh = self.get('ssh', {})
 
             for machine, config in self.get('hosts', {}).iteritems():
                 machine_host = config.get('host')
                 machine_ssh = config.get('ssh', global_ssh)
-                machine_metrics = global_metrics.copy()
-                machine_metrics.update(config.get('plugins', {}))
+                machine_metrics = global_metrics[:]
+                machine_metrics.extend(config.get('plugins', []))
                 self._hosts.append(Machine(machine_host, machine_ssh, machine_metrics))
             log.debug('loaded hosts %s' % self._hosts)
 

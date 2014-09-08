@@ -5,7 +5,7 @@ import socket
 
 from datetime import datetime
 
-from om.plugin import list_plugins, list_default_plugins, NativeReachablePlugin
+from om.plugin import create_plugin, list_plugins, list_default_plugins, NativeReachablePlugin
 from om.executor import Executor
 from om.metric import Metric
 from om.utils.logger import get_logger
@@ -46,15 +46,14 @@ class Machine(object):
 
     @staticmethod
     def load_plugins(configs):
+        instances = []
         if not configs:
             plugins = list_default_plugins()
+            for p_klass in plugins:
+                for name, c in configs.get(p_klass.name, {'default': {}}).iteritems():
+                    instances.append(p_klass(**c))
         else:
-            pnames = configs.keys()
-            plugins = [p for p in list_plugins() if p.name in pnames]
-        load = lambda plugin: plugin(**configs.get(plugin.name, {}))
-        instances = []
-        for p_klass in plugins:
-            for name, c in configs.get(p_klass.name, {'default': {}}).iteritems():
-                instances.append(p_klass(**c))
+            for c in configs:
+                instances.append(create_plugin(c))
 
         return instances
