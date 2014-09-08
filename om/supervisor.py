@@ -48,7 +48,10 @@ class Supervisor(object):
 
     def _setup_config_monitor(self):
         self.observer = Observer()
-        self.observer.schedule(self.config_change_handler, path=os.path.dirname(self.config_file), recursive=False)
+        dirname = os.path.dirname(self.config_file)
+        if not dirname:
+            dirname = '.'
+        self.observer.schedule(self.config_change_handler, path=dirname, recursive=False)
 
     def reload_config(self):
         log.info('Config file %s changed, reloading..' % self.CONFIG_FILE)
