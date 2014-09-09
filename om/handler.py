@@ -116,15 +116,18 @@ class Sqlite3Handler(Handler):
     '''Stores the metrics in a sqlite3 database
     '''
 
+    table_metric_prefix = 'om_metric_'
+
     def __init__(self, **kwargs):
         super(Sqlite3Handler,self).__init__()
         self.path = kwargs['path']
+        self.expiration_days = kwargs['expiration_days']
 
     def handles(self, metric):
         return True
 
     def _get_table_name(self, plugin):
-        return 'om_%s' % plugin.name
+        return '%s%s' % (self.table_metric_prefix, plugin.name)
 
     def _type_for_description(self, desc):
         if desc == 'int': return 'INTEGER'
@@ -147,6 +150,21 @@ class Sqlite3Handler(Handler):
         conn = sqlite3.connect(self.path)
         c = conn.cursor()
         c.execute(u'CREATE TABLE IF NOT EXISTS %s (%s)' % (table_name, columns))
+        conn.commit()
+        conn.close()
+
+    def teardown(self):
+        if self.expiration_days is None: return
+
+        conn = sqlite3.connect(self.path)
+        c = conn.cursor()
+
+        c.execute('SELECT NAME FROM sqlite_master WHERE type=\'table\'')
+        for table in filter(lambda x: x[0].startswith(self.table_metric_prefix), c):
+            table_c = conn.cursor()
+            table_c.execute("DELETE FROM %s WHERE "
+                            "date('now') > datetime(timestamp,'+%s day')" %
+                            (table[0], str(self.expiration_days)))
         conn.commit()
         conn.close()
 
