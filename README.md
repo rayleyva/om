@@ -319,41 +319,31 @@ Sends email whenever critical values are found for metrics
 Name: `email`
 Parameters:
 ```ruby
-  {
-    ...
-
-    "handlers": {
-      "email": {
-        "smtp": "<smtp host>",
-        "port": <smtp port>,
-        "security": "<security mechanism used>", #optional, accepts starttls
-        "login": "<smtp user login>",
-        "password": "<smtp user password>",
-        "from": "<from mail>",
-        "to": ["<list of recipients>"],
-        "subject": "<subject for the mail>", #optional
-      }
-    }
+"handlers": {
+  "email": {
+    "smtp": "<smtp host>",
+    "port": <smtp port>,
+    "security": "<security mechanism used>", #optional, accepts starttls
+    "login": "<smtp user login>",
+    "password": "<smtp user password>",
+    "from": "<from mail>",
+    "to": ["<list of recipients>"],
+    "subject": "<subject for the mail>", #optional
   }
+}
 ```
 
 #### Sqlite3 handler
 Saves the metrics to a Sqlite3 database
 Name: `sqlite3`
 Parameters:
-  * *path*: path to the sqlite3 database file
-  * *expiration_days*: days after a metric should be erased from the database
 ```ruby
-  {
-    ...
-
-    "handlers": {
-      "sqlite3": {
-        "path": "<file path>",
-        "expiration_days": <days after a metric is deleted>
-      }
-    }
+"handlers": {
+  "sqlite3": {
+    "path": "<file path>",
+    "expiration_days": <days after a metric is deleted>
   }
+}
 ```
 
 #### Redis handler
@@ -361,17 +351,13 @@ Saves the metrics to a Redis database
 Name: `redis`
 Parameters:
 ```ruby
-  {
-    ...
-
-    "handlers": {
-      "redis": {
-        "host": "<redis host>",
-        "port": <redis port>,
-        "max_list_length": <number> #maximum number of metrics stored per instance and plugin
-      }
-    }
+"handlers": {
+  "redis": {
+    "host": "<redis host>",
+    "port": <redis port>,
+    "max_list_length": <number> #maximum number of metrics stored per instance and plugin
   }
+}
 ```
 
 ## Contributing to om
