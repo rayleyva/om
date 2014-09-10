@@ -188,6 +188,8 @@ class RedisHandler(Handler):
         super(RedisHandler, self).__init__()
         host = kwargs.get('host', 'localhost')
         port = kwargs.get('port', 6379)
+        self.max_list_length = kwargs.get('max_list_length', 0)
+        self.keys_prefix = ''
         self.redis = redis.StrictRedis(host=host, port=port, db=0)
 
     def handles(self, metric):
@@ -195,12 +197,17 @@ class RedisHandler(Handler):
 
     def handle(self, metric):
         pipeline = self.redis.pipeline()
-        host_plugin = u'%s:%s' % (metric.host, metric.plugin.name)
+        host_plugin = u'%s%s:%s' % (self.keys_prefix, metric.host, metric.plugin.name)
         for instance, datadict in metric.values.iteritems():
             host_plugin_instance = u'%s:%s' % (host_plugin, instance)
             for k,v in datadict.iteritems():
                 pipeline.lpush(u'%s:%s' % (host_plugin_instance, k), "[%d,%s]" % (time.time(), v))
         pipeline.execute()
+
+    def teardown(self):
+        if self.max_list_length == 0: return
+        for k in self.redis.keys('%s*' % self.keys_prefix):
+            self.redis.ltrim(k, 0, self.max_list_length-1)
 
 HANDLERS = [MailHandler, JSONStdoutHandler, StdoutHandler, Sqlite3Handler, RedisHandler]
 def list_handlers():
