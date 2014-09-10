@@ -161,7 +161,7 @@ Remember that having your SSH keys in place for the current user allows you to s
 
 ### Plugins
 
-List available plugins:
+Plugins are the units that collect the metrics on the designated machines. Plugins are added as an object to the `plugins` list.
 
 ```shell
 $ om -p
@@ -250,6 +250,50 @@ You can also override the default value globally:
       }
     }
   ]
+}
+```
+
+#### Disk Usage
+Checks if disk usage is above a percentual threshold.
+```ruby
+{
+  "type": "disk_usage",
+  "thresholds": {
+    "usage": "50%" #optional, default: 80%
+  }
+}
+```
+
+#### Memory Usage
+Checks if memory usage is above a percentual threshold.
+```ruby
+{
+  "type": "memory_usage",
+  "thresholds": {
+    "usage": "50%" #optional, default: 70%
+  }
+}
+```
+
+#### CPU Load
+Checks if the CPU load average is above a percentual threshold for the past 1, 5 and 15 minutes intervals.
+```ruby
+{
+  "type": "cpu_load",
+  "thresholds": {
+    "avg_1min":  "90%", #optional, default: 25%
+    "avg_5min":  "80%", #optional, default: 50%
+    "avg_15min": "75%"  #optional, default: 75%
+  }
+}
+```
+
+#### Process state
+Checks if a process with a given name is running at the host.
+```ruby
+{
+  "type": "process_state",
+  "process_name": "<name of the process>"
 }
 ```
 
