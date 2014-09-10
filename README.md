@@ -260,6 +260,44 @@ results to stdout or can save the metrics to a database. Plugins can be configur
 indicates a risky situation. Handlers have access to this information and it can act only if the value is critical. For example, an Email handler
 can be configured to mail sysadmins only if the value reaches a critical or bad value.
 
+#### Standard Output
+Simple handler that just dumps the metrics to the standard output
+Name: `stdout`
+Parameters: none
+
+#### JSON Standard Output
+Dumps the metrics to the standard output in JSON format
+Name: `json_stdout`
+Parameters: none
+
+#### Email handler
+Sends email whenever critical values are found for metrics
+Name: `email`
+Parameters:
+  * *smtp*: the smtp server host
+  * *port*: the smtp server port
+  * *security*: security mechanism used (optional, only available method is starttls)
+  * *login*: the smtp server login name
+  * *password*: the smtp server password for the user `login`
+  * *from*: the mail address from which the mail should be sent
+  * *to*: list of mail addresses that should receive the mail
+  * *subject*: mail subject to be used
+
+#### Sqlite3 handler
+Saves the metrics to a Sqlite3 database
+Name: `sqlite3`
+Parameters:
+  * *path*: path to the sqlite3 database file
+  * *expiration_days*: days after a metric should be erased from the database
+
+#### Redis handler
+Saves the metrics to a Redis database
+Name: `redis`
+Parameters:
+  * *host*: Redis database host
+  * *port*: Redis database port
+  * *max_list_length*: Maximum number of values to be stored for an instance's metric
+
 ## Contributing to om
 
 You're encouraged to submit issues, PRs and weigh in with your opinion anywhere. If you want to know how to get started,
