@@ -50,8 +50,13 @@ class Machine(object):
         if not configs:
             plugins = list_default_plugins()
             for p_klass in plugins:
-                for name, c in configs.get(p_klass.name, {'default': {}}).iteritems():
-                    instances.append(p_klass(**c))
+                override = {}
+                for instance in configs:
+                    if instance['type'] == p_klass.name:
+                        del instance['type']
+                        override = instance
+                instances.append(p_klass(**override))
+
         else:
             for c in configs:
                 instances.append(create_plugin(c))
